@@ -1,9 +1,17 @@
-all: c.result perl.result php.result python.result python3.result ruby.result
+all: c.result crystal.result perl.result php.result python.result python3.result ruby.result
 
 c.result: one_million.c
-	gcc -O9 -o one_million one_million.c &> /dev/null
-	time ./one_million &> /dev/null
+	gcc -o one_million_c one_million.c &> /dev/null
+	time ./one_million_c &> /dev/null
 	echo
+
+crystal.result: one_million.cr
+	crystal build --release -o one_million_cr one_million.cr
+	time ./one_million_cr &> /dev/null
+
+go.result: one_million.go
+	go build -o one_million_go one_million.go
+	time ./one_million_go &> /dev/null
 
 perl.result: one_million.pl
 	time perl one_million.pl &> /dev/null
@@ -14,7 +22,7 @@ php.result: one_million.phps
 	echo
 
 python.result: one_million.py
-	time python one_million.py &> /dev/null
+	time python2 one_million.py &> /dev/null
 	echo
 
 python3.result: one_million.py3
@@ -26,4 +34,4 @@ ruby.result: one_million.rb
 	echo
 
 clean:
-	rm -f one_million
+	rm -f one_million_c one_million_cr one_million_go
