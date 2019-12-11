@@ -1,4 +1,4 @@
-all: c.result crystal.result perl.result php.result python.result python3.result ruby.result
+all: c.result crystal.result go.result perl.result php.result python.result python3.result ruby.result rust.result
 
 c.result: one_million.c
 	gcc -o one_million_c one_million.c &> /dev/null
@@ -33,5 +33,9 @@ ruby.result: one_million.rb
 	time ruby one_million.rb &> /dev/null
 	echo
 
+rust.result: one_million.rs
+	rustc -o one_million_rust one_million.rs &> /dev/null
+	time ./one_million_rust &> /dev/null
+
 clean:
-	rm -f one_million_c one_million_cr one_million_go
+	rm -f one_million_c one_million_cr one_million_go one_million_rust
