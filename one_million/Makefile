@@ -1,4 +1,4 @@
-all: c.result cpp.result crystal.result go.result perl.result php.result python.result python3.result ruby.result rust.result
+all: c.result cpp.result crystal.result go.result java.result perl.result php.result python.result python3.result ruby.result rust.result
 
 c.result: one_million.c
 	gcc -o one_million_c one_million.c &> /dev/null
@@ -13,10 +13,17 @@ cpp.result: one_million.cpp
 crystal.result: one_million.cr
 	crystal build --release -o one_million_cr one_million.cr
 	time ./one_million_cr &> /dev/null
+	echo
 
 go.result: one_million.go
 	go build -o one_million_go one_million.go
 	time ./one_million_go &> /dev/null
+	echo
+
+java.result: one_million.java
+	javac one_million.java
+	time java OneMillion > /dev/null
+	echo
 
 perl.result: one_million.pl
 	time perl one_million.pl &> /dev/null
@@ -43,4 +50,4 @@ rust.result: one_million.rs
 	time ./one_million_rust &> /dev/null
 
 clean:
-	rm -f one_million_c one_million_cpp one_million_cr one_million_go one_million_rust
+	rm -f one_million_c one_million_cpp one_million_cr one_million_go OneMillion.class one_million_rust
