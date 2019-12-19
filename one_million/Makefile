@@ -1,8 +1,13 @@
-all: c.result crystal.result go.result perl.result php.result python.result python3.result ruby.result rust.result
+all: c.result cpp.result crystal.result go.result perl.result php.result python.result python3.result ruby.result rust.result
 
 c.result: one_million.c
 	gcc -o one_million_c one_million.c &> /dev/null
 	time ./one_million_c &> /dev/null
+	echo
+
+cpp.result: one_million.cpp
+	g++ -o one_million_cpp one_million.cpp &> /dev/null
+	time ./one_million_cpp &> /dev/null
 	echo
 
 crystal.result: one_million.cr
@@ -38,4 +43,4 @@ rust.result: one_million.rs
 	time ./one_million_rust &> /dev/null
 
 clean:
-	rm -f one_million_c one_million_cr one_million_go one_million_rust
+	rm -f one_million_c one_million_cpp one_million_cr one_million_go one_million_rust
