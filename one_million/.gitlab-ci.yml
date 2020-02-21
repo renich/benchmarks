@@ -1,0 +1,9 @@
+image: "alpine:latest"
+
+before_script:
+  - apk add --no-cache crystal g++ gcc go make nodejs-current openjdk11 perl php7 python2 python3 ruby rust
+  - ln -s /usr/lib/jvm/default-jvm/bin/javac /usr/local/bin/javac
+
+all:
+    script:
+        cd one_million; make
