@@ -34,7 +34,7 @@ perl.result: one_million.pl
 	echo
 
 php.result: one_million.phps
-	time php-cgi one_million.phps &> /dev/null
+	time php one_million.phps &> /dev/null
 	echo
 
 python.result: one_million.py
