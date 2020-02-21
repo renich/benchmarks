@@ -1,4 +1,4 @@
-all: c.result cpp.result crystal.result go.result java.result javascript.result perl.result php.result python.result python3.result ruby.result rust.result
+all: c.result cpp.result crystal.result go.result java.result javascript.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result
 
 c.result: one_million.c
 	gcc -o one_million_c one_million.c > /dev/null
@@ -44,6 +44,9 @@ python.result: one_million.py
 python3.result: one_million.py3
 	time python3 one_million.py3 > /dev/null
 	echo
+
+rakudo.result: one_million.p6
+	time perl6 one_million.p6 > /dev/null
 
 ruby.result: one_million.rb
 	time ruby one_million.rb > /dev/null
