@@ -1,4 +1,4 @@
-all: c.result cpp.result crystal.result go.result java.result javascript.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result
+all: c.result cpp.result crystal.result go.result java.result javascript.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result nim.result
 
 c.result: one_million.c
 	clang -o one_million_c one_million.c > /dev/null
@@ -55,6 +55,10 @@ ruby.result: one_million.rb
 rust.result: one_million.rs
 	rustc -o one_million_rust one_million.rs > /dev/null
 	time ./one_million_rust > /dev/null
+
+nim.result: one_million.nim
+	nim c --cc:clang -d:danger -o:one_million_nim one_million.nim
+	time ./one_million_nim > /dev/null
 
 clean:
 	rm -f one_million_c one_million_cpp one_million_cr one_million_go OneMillion.class one_million_rust
