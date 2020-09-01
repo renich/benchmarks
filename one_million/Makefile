@@ -57,7 +57,7 @@ rust.result: one_million.rs
 	time ./one_million_rust > /dev/null
 
 nim.result: one_million.nim
-	nim c --cc:clang -d:danger -o:one_million_nim one_million.nim
+	nim c --cc:clang -d:danger --verbosity:0 --hints:off -o:one_million_nim one_million.nim
 	time ./one_million_nim > /dev/null
 
 clean:
