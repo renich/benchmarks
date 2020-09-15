@@ -8,6 +8,8 @@ c.result: one_million.c
 cpp.result: one_million.cpp
 	clang++ -o one_million_cpp one_million.cpp > /dev/null
 	time ./one_million_cpp > /dev/null
+	clang++ -o one_million_ash_cpp one_million_ash.cpp > /dev/null
+	time ./one_million_ash_cpp > /dev/null
 	echo
 
 crystal.result: one_million.cr
@@ -57,4 +59,4 @@ rust.result: one_million.rs
 	time ./one_million_rust > /dev/null
 
 clean:
-	rm -f one_million_c one_million_cpp one_million_cr one_million_go OneMillion.class one_million_rust
+	rm -f one_million_c one_million_cpp one_million_cr one_million_go OneMillion.class one_million_rust one_million_ash_cpp
