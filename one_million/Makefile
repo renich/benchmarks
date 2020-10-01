@@ -8,6 +8,7 @@ c.result: one_million.c
 cpp.result: one_million.cpp
 	clang++ -o one_million_cpp one_million.cpp > /dev/null
 	time ./one_million_cpp > /dev/null
+	echo
 	clang++ -o one_million_ash_cpp one_million_ash.cpp > /dev/null
 	time ./one_million_ash_cpp > /dev/null
 	echo
