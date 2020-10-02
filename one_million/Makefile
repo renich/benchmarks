@@ -1,4 +1,4 @@
-all: c.result cpp.result crystal.result go.result java.result javascript.result nim.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result
+all: c.result cpp.result crystal.result go.result java.result nim.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result
 
 c.result: one_million.c
 	clang -o one_million_c one_million.c > /dev/null
