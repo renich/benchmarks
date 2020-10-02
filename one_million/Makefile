@@ -1,4 +1,4 @@
-all: c.result cpp.result crystal.result go.result java.result javascript.result nim.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result haskell.result
+all: c.result cpp.result crystal.result go.result java.result nim.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result haskell.result
 
 c.result: one_million.c
 	clang -o one_million_c one_million.c > /dev/null
@@ -26,6 +26,7 @@ go.result: one_million.go
 haskell.result: one_million.hs
 	ghs -o one_million_haskell one_million.hs
 	time ./one_million_haskell > /dev/null
+	echo
 
 java.result: one_million.java
 	javac one_million.java
@@ -39,6 +40,7 @@ javascript.result: one_million.js
 nim.result: one_million.nim
 	nim c --cc:clang -d:danger --verbosity:0 --hints:off -o:one_million_nim one_million.nim
 	time ./one_million_nim > /dev/null
+	echo
 
 perl.result: one_million.pl
 	time perl one_million.pl > /dev/null
@@ -58,6 +60,7 @@ python3.result: one_million.py3
 
 rakudo.result: one_million.p6
 	time perl6 one_million.p6 > /dev/null
+	echo
 
 ruby.result: one_million.rb
 	time ruby one_million.rb > /dev/null
@@ -66,6 +69,7 @@ ruby.result: one_million.rb
 rust.result: one_million.rs
 	rustc -o one_million_rust one_million.rs > /dev/null
 	time ./one_million_rust > /dev/null
+	echo
 
 clean:
 	rm -f one_million_ash_cpp one_million_c OneMillion.class one_million_cpp one_million_cr one_million_go one_million_haskell one_million._nim one_million_rust
