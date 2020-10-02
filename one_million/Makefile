@@ -1,4 +1,4 @@
-all: c.result cpp.result crystal.result go.result java.result nim.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result haskell.result
+all: c.result cpp.result crystal.result go.result haskell.result java.result nim.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result
 
 c.result: one_million.c
 	clang -o one_million_c one_million.c > /dev/null
@@ -24,7 +24,7 @@ go.result: one_million.go
 	echo
 
 haskell.result: one_million.hs
-	ghs -o one_million_haskell one_million.hs
+	ghc -o one_million_haskell one_million.hs
 	time ./one_million_haskell > /dev/null
 	echo
 
