@@ -1,4 +1,5 @@
 all: c.result cpp.result crystal.result go.result java.result javascript.result nim.result perl.result php.result python.result python3.result rakudo.result ruby.result rust.result haskell.result
+
 c.result: one_million.c
 	clang -o one_million_c one_million.c > /dev/null
 	time ./one_million_c > /dev/null
@@ -21,6 +22,10 @@ go.result: one_million.go
 	go build -o one_million_go one_million.go
 	time ./one_million_go > /dev/null
 	echo
+
+haskell.result: one_million.hs
+	ghs -o one_million_haskell one_million.hs
+	time ./one_million_haskell > /dev/null
 
 java.result: one_million.java
 	javac one_million.java
@@ -62,8 +67,5 @@ rust.result: one_million.rs
 	rustc -o one_million_rust one_million.rs > /dev/null
 	time ./one_million_rust > /dev/null
 
-haskell.result: one_million.hs
-	ghs -o one_million_haskell one_million.hs
-	time ./one_million_haskell > /dev/null
 clean:
-	rm -f one_million_ash_cpp one_million_c OneMillion.class one_million_cpp one_million_cr one_million_go one_million._nim one_million_rust one_million_haskell
+	rm -f one_million_ash_cpp one_million_c OneMillion.class one_million_cpp one_million_cr one_million_go one_million_haskell one_million._nim one_million_rust
