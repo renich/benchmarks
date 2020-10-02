@@ -35,6 +35,7 @@ javascript.result: one_million.js
 nim.result: one_million.nim
 	nim c --cc:clang -d:danger --verbosity:0 --hints:off -o:one_million_nim one_million.nim
 	time ./one_million_nim > /dev/null
+	echo
 
 perl.result: one_million.pl
 	time perl one_million.pl > /dev/null
@@ -54,6 +55,7 @@ python3.result: one_million.py3
 
 rakudo.result: one_million.p6
 	time perl6 one_million.p6 > /dev/null
+	echo
 
 ruby.result: one_million.rb
 	time ruby one_million.rb > /dev/null
@@ -62,6 +64,7 @@ ruby.result: one_million.rb
 rust.result: one_million.rs
 	rustc -o one_million_rust one_million.rs > /dev/null
 	time ./one_million_rust > /dev/null
+	echo
 
 clean:
 	rm -f one_million_ash_cpp one_million_c OneMillion.class one_million_cpp one_million_cr one_million_go one_million._nim one_million_rust
