@@ -59,7 +59,7 @@ python3.result: one_million.py3
 	echo
 
 rakudo.result: one_million.p6
-	time perl6 one_million.p6 > /dev/null
+	time perl6 -o one_million_rakudo one_million.p6 > /dev/null
 	echo
 
 ruby.result: one_million.rb
@@ -72,4 +72,4 @@ rust.result: one_million.rs
 	echo
 
 clean:
-	rm -f one_million_ash_cpp one_million_c OneMillion.class one_million_cpp one_million_cr one_million_go one_million_haskell one_million._nim one_million_rust
+	rm -f one_million_ash_cpp one_million_c OneMillion.class one_million_cpp one_million_cr one_million_go one_million_haskell one_million.hi one_million_nim one_million_rust one_million.o
