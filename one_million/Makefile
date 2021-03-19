@@ -63,7 +63,7 @@ rakudo.result: one_million.p6
 	echo
 
 ruby.result: one_million.rb
-	time ruby one_million.rb > /dev/null
+	time ruby --jit one_million.rb > /dev/null
 	echo
 
 rust.result: one_million.rs
