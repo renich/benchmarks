@@ -3,7 +3,7 @@ image: "alpine:latest"
 before_script:
   - echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
   - echo 'http://dl-cdn.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories
-  - apk add --no-cache crystal clang g++ ghc go make nodejs-current openjdk11 perl php7 python3 rakudo ruby rust nim
+  - apk add --no-cache crystal clang g++ ghc go make nodejs-current openjdk17 perl php7 python3 rakudo ruby rust nim
   - ln -s /usr/lib/jvm/default-jvm/bin/javac /usr/local/bin/javac
 
 benchmark-all:
