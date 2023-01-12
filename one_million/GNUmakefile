@@ -14,7 +14,7 @@ cpp.result: one_million.cpp
 	echo
 
 crystal.result: one_million.cr
-	crystal build --release -o one_million_cr one_million.cr
+	crystal build --release --no-debug -o one_million_cr one_million.cr
 	time ./one_million_cr > /dev/null
 	echo
 
@@ -69,3 +69,5 @@ rust.result: one_million.rs
 
 clean:
 	rm -f one_million_ash_cpp one_million_c OneMillion.class one_million_cpp one_million_cr one_million_go one_million_haskell one_million.hi one_million_nim one_million_rust one_million.o
+
+.PHONY: clean
