@@ -1,7 +1,7 @@
 image: "alpine:latest"
 
 before_script:
-  - apk add --no-cache crystal clang g++ ghc go libffi-dev make nodejs-current openjdk17 perl php8 python3 rakudo ruby rust nim
+  - apk add --no-cache crystal clang g++ ghc go libffi-dev make nodejs-current openjdk17 perl php python3 rakudo ruby rust nim
   - ln -s /usr/lib/jvm/default-jvm/bin/javac /usr/local/bin/javac
 
 benchmark-all:
