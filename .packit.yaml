@@ -15,8 +15,6 @@ jobs:
     targets:
       - fedora-rawhide-x86_64
       - fedora-41-x86_64
-    settings:
-      builder: "powerful"
 
   - job: copr_build
     trigger: commit
@@ -24,8 +22,6 @@ jobs:
     targets:
       - fedora-rawhide-x86_64
       - fedora-41-x86_64
-    settings:
-      builder: "powerful"
 
   - job: tests
     trigger: pull_request
