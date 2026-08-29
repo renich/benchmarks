@@ -41,10 +41,23 @@ def generate_site(data_path, site_dir, output_dir):
     shutil.copy2(site_path / "app.js", out_path / "app.js")
     shutil.copy2(data_file, out_path / "benchmark_data.json")
 
+    favicon = site_path / "favicon.svg"
+    if favicon.exists():
+        shutil.copy2(favicon, out_path / "favicon.svg")
+
+    assets_dir = site_path.parent / "assets"
+    if assets_dir.exists():
+        out_assets = out_path / "assets"
+        out_assets.mkdir(exist_ok=True)
+        for item in assets_dir.glob("*"):
+            if item.is_file():
+                shutil.copy2(item, out_assets / item.name)
+
     print(f"[+] Static site generated successfully at: {out_path}")
     print(f"    - index.html ({len(final_html)} bytes)")
     print(f"    - style.css")
     print(f"    - app.js")
+    print(f"    - favicon.svg")
     print(f"    - benchmark_data.json")
 
 def main():

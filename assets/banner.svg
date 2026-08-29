@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="40%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+    <linearGradient id="dialGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="80%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.8"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1200" height="320" rx="16" fill="url(#bannerBg)"/>
+  <rect width="1196" height="316" x="2" y="2" rx="14" fill="none" stroke="#334155" stroke-width="2" stroke-opacity="0.6"/>
+
+  <!-- Subtle Speed Graphic Curves in Background -->
+  <path d="M 0,220 Q 300,100 600,180 T 1200,80" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.15"/>
+  <path d="M 0,260 Q 400,150 800,240 T 1200,140" fill="none" stroke="#818cf8" stroke-width="1.5" stroke-opacity="0.15"/>
+
+  <!-- Left Icon Emblem (Speedometer / Tachometer) -->
+  <g transform="translate(60, 45)">
+    <!-- Base Glow Plate -->
+    <circle cx="115" cy="115" r="105" fill="#0f172a" stroke="#334155" stroke-width="4"/>
+    <circle cx="115" cy="115" r="100" fill="none" stroke="url(#titleGrad)" stroke-width="2" stroke-opacity="0.5"/>
+
+    <!-- Speed Arc -->
+    <path d="M 50 170 A 80 80 0 1 1 180 170" fill="none" stroke="#1e293b" stroke-width="14" stroke-linecap="round"/>
+    <path d="M 50 170 A 80 80 0 1 1 165 85" fill="none" stroke="url(#dialGrad)" stroke-width="14" stroke-linecap="round" filter="url(#glow)"/>
+
+    <!-- Needle -->
+    <polygon points="115,45 124,115 115,125 106,115" fill="#f59e0b" filter="url(#glow)"/>
+    <circle cx="115" cy="120" r="16" fill="#0f172a" stroke="#38bdf8" stroke-width="4"/>
+    <circle cx="115" cy="120" r="6" fill="#38bdf8"/>
+
+    <!-- Tachometer Text -->
+    <text x="115" y="195" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="22" fill="#ffffff" letter-spacing="2">1,000,000</text>
+  </g>
+
+  <!-- Central Header Text -->
+  <g transform="translate(320, 85)">
+    <!-- Small Category Pill -->
+    <rect width="185" height="26" rx="13" fill="#38bdf8" fill-opacity="0.15" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.4"/>
+    <text x="92" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="12" fill="#38bdf8" letter-spacing="1.5">POLYGLOT ENGINE</text>
+
+    <!-- Main Title -->
+    <text x="0" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="46" fill="url(#titleGrad)" letter-spacing="1">POLYGLOT BENCHMARKS</text>
+
+    <!-- Subtitle -->
+    <text x="0" y="105" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="500" font-size="16" fill="#94a3b8">
+      A reproducible multi-language performance platform comparing 15 runtimes in Alpine Linux.
+    </text>
+
+    <!-- Badges Row Inside Banner -->
+    <g transform="translate(0, 130)">
+      <!-- Badge 1: Race vs Naive -->
+      <rect width="180" height="30" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="90" y="20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="12" fill="#f59e0b">⚡ Race &amp; Naive Modes</text>
+
+      <!-- Badge 2: Alpine Container -->
+      <rect x="190" width="165" height="30" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="272" y="20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="12" fill="#38bdf8">🐳 Podman &amp; Alpine</text>
+
+      <!-- Badge 3: 15 Languages -->
+      <rect x="365" width="145" height="30" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="437" y="20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="12" fill="#10b981">✨ 15 Languages</text>
+
+      <!-- Badge 4: GitLab Pages -->
+      <rect x="520" width="160" height="30" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="600" y="20" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="600" font-size="12" fill="#c084fc">🌐 GitLab Pages Live</text>
+    </g>
+  </g>
+</svg>

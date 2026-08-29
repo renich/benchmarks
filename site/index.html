@@ -4,7 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Polyglot Benchmark Suite & Leaderboard</title>
-  <meta name="description" content="Multi-language performance benchmarks across compiled, JIT, and interpreted languages in Alpine Linux container environment.">
+  <meta name="description" content="Reproducible, multi-language performance benchmarks comparing 15 programming languages in Alpine Linux container environment.">
+  <meta name="keywords" content="benchmark, performance, polyglot, crystal, rust, c, cpp, go, python, java, php, perl, ruby, raku, r, haskell, nim, alpine linux, podman">
+  <meta name="author" content="Rénich Bon Ćirić">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- OpenGraph Metadata -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Polyglot Benchmark Suite & Leaderboard">
+  <meta property="og:description" content="Comparing out-of-the-box ergonomics against maximum throughput race mode across 15 programming languages.">
+  <meta property="og:url" content="https://renich.gitlab.io/benchmarks/">
+  <meta property="og:image" content="https://gitlab.com/renich/benchmarks/-/raw/master/assets/banner.svg">
+
+  <!-- Twitter Metadata -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Polyglot Benchmark Suite & Leaderboard">
+  <meta name="twitter:description" content="15 Languages benchmarked in isolated Alpine Linux container.">
+  <meta name="twitter:image" content="https://gitlab.com/renich/benchmarks/-/raw/master/assets/banner.svg">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -20,6 +40,14 @@
           </li>
         </ul>
         <ul>
+          <li>
+            <a href="https://liberapay.com/Renich/donate" target="_blank" rel="noopener" role="button" class="outline" style="border-color: #f6c915; color: #f6c915;">
+              <svg style="width: 1rem; height: 1rem; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              Donate
+            </a>
+          </li>
           <li>
             <a href="https://gitlab.com/renich/benchmarks" target="_blank" rel="noopener" role="button" class="outline secondary">
               <svg style="width: 1rem; height: 1rem; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="currentColor">
@@ -172,8 +200,11 @@ make site</code></pre>
   </dialog>
 
   <footer>
-    <div class="container">
-      <p>Polyglot Benchmark Suite &bull; Maintained by <a href="https://gitlab.com/renich" target="_blank" rel="noopener">Rénich Bon Ćirić</a> &bull; Built with Pico CSS v2 & Alpine Linux</p>
+    <div class="container" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+      <p style="margin: 0;">Polyglot Benchmark Suite &bull; Maintained by <a href="https://gitlab.com/renich" target="_blank" rel="noopener">Rénich Bon Ćirić</a> &bull; Built with Pico CSS v2 & Alpine Linux</p>
+      <a href="https://liberapay.com/Renich/donate" target="_blank" rel="noopener">
+        <img src="https://liberapay.com/assets/widgets/donate.svg" alt="Donate using Liberapay" height="30">
+      </a>
     </div>
   </footer>
 

@@ -1,5 +1,34 @@
+===================
 Polyglot Benchmarks
 ===================
+
+.. image:: https://gitlab.com/renich/benchmarks/-/raw/master/assets/banner.svg
+   :width: 100%
+   :align: center
+   :alt: Polyglot Benchmarks Banner
+
+|
+
+.. image:: https://gitlab.com/renich/benchmarks/badges/master/pipeline.svg
+   :target: https://gitlab.com/renich/benchmarks/-/commits/master
+   :alt: Pipeline Status
+.. image:: https://img.shields.io/badge/GitLab_Pages-Live_Dashboard-fc6d26?logo=gitlab&style=flat-square
+   :target: https://renich.gitlab.io/benchmarks/
+   :alt: GitLab Pages Live Dashboard
+.. image:: https://img.shields.io/badge/Languages-15_Polyglot-3b82f6?style=flat-square
+   :target: https://renich.gitlab.io/benchmarks/
+   :alt: 15 Languages Benchmarked
+.. image:: https://img.shields.io/badge/Environment-Alpine_Linux_Container-0d597f?logo=alpinelinux&style=flat-square
+   :target: Containerfile
+   :alt: Alpine Linux Container
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg?logo=gnu&style=flat-square
+   :target: LICENSE
+   :alt: License
+.. image:: https://img.shields.io/badge/Donate-Liberapay-f6c915.svg?logo=liberapay&logoColor=black&style=flat-square
+   :target: https://liberapay.com/Renich/donate
+   :alt: Donate using Liberapay
+
+|
 
 A reproducible, multi-language benchmark suite comparing execution times, peak memory usage (RSS), and I/O throughput across **15 programming languages** running inside an isolated **Alpine Linux** container environment.
 
@@ -122,3 +151,16 @@ Adding a New Benchmark Suite
 1. Create a new directory (e.g. ``matrix_mult/``) with a ``benchmark.json`` descriptor.
 2. Provide ``naive/`` and ``optimized/`` implementations following the naming convention.
 3. Run ``make all`` to automatically execute and publish results to the dashboard.
+
+Support & Donations
+-------------------
+If you find these benchmarks insightful and would like to support ongoing development, consider donating via Liberapay:
+
+.. image:: https://liberapay.com/assets/widgets/donate.svg
+   :target: https://liberapay.com/Renich/donate
+   :alt: Donate using Liberapay
+
+License
+-------
+This project is licensed under the GNU General Public License v3.0 or later.
+See the `LICENSE <LICENSE>`_ file for details.
