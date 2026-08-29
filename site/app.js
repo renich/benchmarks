@@ -5,6 +5,13 @@ let currentSuiteId = "one_million";
 let currentMode = "optimized"; // 'optimized' | 'naive'
 let currentCategoryFilter = "all";
 
+const SUITE_ICONS = {
+  one_million: "⚡",
+  pipeline: "🔀",
+  tree_walk: "📁",
+  async_checker: "⏱️",
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   if (window.BENCHMARK_DATA) {
     benchmarkData = window.BENCHMARK_DATA;
@@ -25,14 +32,13 @@ document.addEventListener("DOMContentLoaded", () => {
 function initDashboard() {
   if (!benchmarkData || !benchmarkData.suites) return;
 
-  // Set default suite to first discovered suite if one_million is not present
   const suites = Object.keys(benchmarkData.suites);
   if (!suites.includes(currentSuiteId) && suites.length > 0) {
     currentSuiteId = suites[0];
   }
 
   renderSystemSpecs(benchmarkData.system);
-  setupSuiteSelector();
+  setupSuiteControls();
   renderDashboard();
 
   // Attach Mode Switcher handlers
@@ -67,36 +73,72 @@ function renderSystemSpecs(system) {
   }
 }
 
-function setupSuiteSelector() {
+function setupSuiteControls() {
   const suites = Object.keys(benchmarkData.suites);
-  const suiteNav = document.getElementById("suite-nav");
-  if (!suiteNav || suites.length <= 1) return;
+  const tabsList = document.getElementById("suite-tabs-list");
+  const selectEl = document.getElementById("suite-select");
 
-  suiteNav.innerHTML = "";
-  suites.forEach((suiteId) => {
-    const suite = benchmarkData.suites[suiteId];
-    const btn = document.createElement("button");
-    btn.id = `tab-btn-${suiteId}`;
-    btn.className = suiteId === currentSuiteId ? "active" : "outline";
-    btn.textContent = suite.title || suiteId;
-    btn.addEventListener("click", () => {
-      if (currentSuiteId === suiteId) return;
-      currentSuiteId = suiteId;
-      updateSuiteSelectorActiveState();
+  if (tabsList) {
+    tabsList.innerHTML = "";
+    suites.forEach((suiteId) => {
+      const suite = benchmarkData.suites[suiteId];
+      const icon = SUITE_ICONS[suiteId] || "📊";
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.id = `tab-btn-${suiteId}`;
+      btn.className = `suite-tab-btn ${suiteId === currentSuiteId ? "active" : ""}`;
+      btn.innerHTML = `<span>${icon}</span> <span>${suite.title || suiteId}</span>`;
+      btn.addEventListener("click", () => {
+        if (currentSuiteId === suiteId) return;
+        currentSuiteId = suiteId;
+        updateSuiteActiveState();
+        renderDashboard();
+      });
+      li.appendChild(btn);
+      tabsList.appendChild(li);
+    });
+  }
+
+  if (selectEl) {
+    selectEl.innerHTML = "";
+    suites.forEach((suiteId) => {
+      const suite = benchmarkData.suites[suiteId];
+      const icon = SUITE_ICONS[suiteId] || "📊";
+      const opt = document.createElement("option");
+      opt.value = suiteId;
+      opt.textContent = `${icon} ${suite.title || suiteId}`;
+      opt.selected = suiteId === currentSuiteId;
+      selectEl.appendChild(opt);
+    });
+
+    selectEl.addEventListener("change", (e) => {
+      const selected = e.target.value;
+      if (currentSuiteId === selected) return;
+      currentSuiteId = selected;
+      updateSuiteActiveState();
       renderDashboard();
     });
-    suiteNav.appendChild(btn);
-  });
+  }
 }
 
-function updateSuiteSelectorActiveState() {
+function updateSuiteActiveState() {
   const suites = Object.keys(benchmarkData.suites);
   suites.forEach((suiteId) => {
     const btn = document.getElementById(`tab-btn-${suiteId}`);
     if (btn) {
-      btn.className = suiteId === currentSuiteId ? "active" : "outline";
+      if (suiteId === currentSuiteId) {
+        btn.classList.add("active");
+        btn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      } else {
+        btn.classList.remove("active");
+      }
     }
   });
+
+  const selectEl = document.getElementById("suite-select");
+  if (selectEl) {
+    selectEl.value = currentSuiteId;
+  }
 }
 
 function renderDashboard() {

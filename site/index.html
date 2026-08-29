@@ -71,23 +71,31 @@
   </header>
 
   <main class="container">
-    <!-- Suite Tabs (Multi-Benchmark Extensibility) -->
-    <div id="suite-nav" role="group" style="margin-bottom: 1.5rem;"></div>
+    <!-- Compact Dashboard Control Toolbar -->
+    <div class="dashboard-toolbar">
+      <nav class="suite-tabs-nav" aria-label="Benchmark Suites">
+        <ul id="suite-tabs-list">
+          <!-- Dynamically populated suite pills -->
+        </ul>
+      </nav>
 
-    <!-- Active Suite Header -->
-    <section class="suite-header-block" style="margin-bottom: 2rem;">
+      <div class="toolbar-controls">
+        <select id="suite-select" class="suite-select-dropdown" aria-label="Select benchmark suite">
+          <!-- Dynamically populated options -->
+        </select>
+        <div class="segmented-control mode-control">
+          <button data-mode-btn="optimized" class="active">⚡ Race</button>
+          <button data-mode-btn="naive">📦 Naive</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Suite Header Info -->
+    <section class="suite-header-block">
       <div class="suite-header-info">
         <h2 id="suite-title">-</h2>
         <div class="suite-description-box">
           <p id="suite-description">-</p>
-        </div>
-      </div>
-
-      <!-- Mode Switcher -->
-      <div class="mode-toggle">
-        <div class="segmented-control">
-          <button data-mode-btn="optimized" class="active">⚡ Race Mode (Optimized)</button>
-          <button data-mode-btn="naive">📦 Out of the Box (Naive)</button>
         </div>
       </div>
 
@@ -143,7 +151,7 @@
         <table class="benchmark-table">
           <thead>
             <tr>
-              <th style="width: 4rem;">Rank</th>
+              <th style="width: 4.5rem;">Rank</th>
               <th>Language & Runtime</th>
               <th>Category</th>
               <th>Execution Time (Median)</th>
@@ -166,17 +174,18 @@
         <div style="padding-top: 1rem;">
           <h4>Measurement Protocol</h4>
           <ul>
-            <li>Every benchmark implementation generates numbers <code>0..999,999</code> and writes formatted lines to standard output redirected to <code>/dev/null</code>.</li>
+            <li>Every benchmark implementation produces exact deterministic checksums and outputs verified against test assertions.</li>
             <li>All runs execute inside an unprivileged Alpine Linux container (<code>benchmarks-env</code>) using the same kernel and CPU allocation.</li>
+            <li><strong>Peak RAM</strong> is captured per-process using isolated GNU time tracking.</li>
             <li><strong>Naive Mode</strong>: Uses standard idiomatic language print/loop statements with standard defaults.</li>
-            <li><strong>Optimized (Race Mode)</strong>: Uses maximal chunked buffered I/O, syscall batching, release compiler optimizations (<code>-O3</code>, <code>--release</code>), and fast integer formatting.</li>
+            <li><strong>Optimized (Race Mode)</strong>: Uses maximal chunked buffered I/O, syscall batching, native CPU targeting (<code>--mcpu=native</code>, <code>-march=native</code>), and fast zero-allocation byte scans.</li>
           </ul>
 
           <h4>How to Run Locally</h4>
           <pre><code># Build container image with all runtimes
 make build-env
 
-# Execute the full benchmark suite
+# Execute all benchmark suites
 make bench
 
 # Generate static dashboard into public/
