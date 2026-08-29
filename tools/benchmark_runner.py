@@ -416,10 +416,12 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
 
 def discover_suites(base_dir):
     base_path = Path(base_dir).resolve()
+    preferred_order = ["one_million", "pipeline", "tree_walk", "async_checker"]
     suites = []
-    for item in sorted(base_path.iterdir()):
+    for item in base_path.iterdir():
         if item.is_dir() and (item / "benchmark.json").exists():
             suites.append(item)
+    suites.sort(key=lambda p: preferred_order.index(p.name) if p.name in preferred_order else 99)
     return suites
 
 
