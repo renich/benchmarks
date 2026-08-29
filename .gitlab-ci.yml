@@ -1,10 +1,41 @@
-image: "alpine:latest"
+default:
+  image: alpine:latest
+  interruptible: true
 
-before_script:
-  - apk add --no-cache crystal clang g++ ghc go libffi-dev make nodejs-current openjdk21 perl php python3 rakudo ruby rust nim
-  - ln -s /usr/lib/jvm/default-jvm/bin/javac /usr/local/bin/javac
+stages:
+  - benchmark
+  - deploy
 
-benchmark-all:
-    script:
-        - cd one_million;
-        - make
+variables:
+  RUNS: "3"
+
+.alpine-setup: &alpine-setup
+  before_script:
+    - apk update && apk add --no-cache bash clang crystal g++ ghc go libffi-dev make nim nodejs-current openjdk21 perl php python3 R R-dev rakudo ruby rust time
+    - ln -sf /usr/lib/jvm/default-jvm/bin/javac /usr/local/bin/javac
+
+benchmark-test:
+  stage: benchmark
+  <<: *alpine-setup
+  script:
+    - python3 tools/benchmark_runner.py --runs ${RUNS} --output benchmark_data.json
+    - python3 tools/site_generator.py --data benchmark_data.json --site site --output public
+  artifacts:
+    name: "benchmark-results-$CI_COMMIT_SHA"
+    paths:
+      - public
+      - benchmark_data.json
+    expire_in: 1 week
+
+pages:
+  stage: deploy
+  needs: ["benchmark-test"]
+  script:
+    - echo "Deploying benchmark static dashboard to GitLab Pages..."
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_COMMIT_BRANCH == "release"'

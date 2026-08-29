@@ -1,11 +1,23 @@
+One Million Lines I/O Benchmark
+================================
+
 Description
-===========
-This is just an I/O benchmarks on different languages.
+-----------
+This suite measures formatted string output and loop throughput across languages.
 
-It generates numbers up to one million and it prints those. The makefile redirects to /dev/null so the benchmark is fast and more accurate.
+Every implementation generates integer numbers from ``0`` to ``999,999`` (exactly 1,000,000 lines) and writes the following exact string to standard output redirected to ``/dev/null``::
 
-Instructions
-============
-* Download the files
-* run: make all
+   Hello, this is iteration number: <n>
 
+Structure
+---------
+* ``naive/``: Idiomatic out-of-the-box print statements.
+* ``optimized/``: High-throughput race mode using buffered I/O, custom formatting, and batch syscalls.
+
+Running
+-------
+Inside the Alpine container or local environment::
+
+   make all       # Runs both optimized and naive
+   make optimized # Runs only race-mode implementations
+   make naive     # Runs only out-of-the-box implementations

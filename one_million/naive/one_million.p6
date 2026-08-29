@@ -1,5 +1,5 @@
-<?php
+#!/usr/bin/env raku
 
-for( $n = 0; $n < 1000000; $n++ ) {
+for 0..^1000000 -> $n {
 	print "Hello, this is iteration number: $n\n";
 }

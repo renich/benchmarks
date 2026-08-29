@@ -1,5 +1,13 @@
+# Build directories & binaries
+_build/
+bin_*
+nimcache/
+*.o
+*.hi
+*.class
 one_million_*
 !one_million_ash.cpp
-OneMillion.class
-one_million.hi
-one_million.o
+
+# Generated benchmark data & static site outputs
+public/
+benchmark_data.json

@@ -1,0 +1,8 @@
+{
+  "id": "one_million",
+  "title": "One Million Lines I/O",
+  "description": "Sequential loop generating numbers 0..999,999 and writing formatted lines to standard output (/dev/null).",
+  "category": "I/O & String Formatting",
+  "unit": "seconds",
+  "modes": ["optimized", "naive"]
+}

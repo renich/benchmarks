@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Polyglot Benchmark Suite & Leaderboard</title>
+  <meta name="description" content="Multi-language performance benchmarks across compiled, JIT, and interpreted languages in Alpine Linux container environment.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <nav>
+        <ul>
+          <li>
+            <span class="hero-badge">Polyglot Benchmarks</span>
+            <h1 style="margin: 0; font-size: 1.75rem;">Language Performance Race</h1>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a href="https://gitlab.com/renich/benchmarks" target="_blank" rel="noopener" role="button" class="outline secondary">
+              <svg style="width: 1rem; height: 1rem; vertical-align: middle; margin-right: 0.25rem;" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22.65 14.39L12 22.13 1.35 14.39a.84.84 0 0 1-.3-.94l1.22-3.78 2.44-7.51A.42.42 0 0 1 4.82 2a.43.43 0 0 1 .58 0 .42.42 0 0 1 .11.18l2.44 7.49h8.1l2.44-7.51A.42.42 0 0 1 18.6 2a.43.43 0 0 1 .58 0 .42.42 0 0 1 .11.18l2.44 7.51L23 13.45a.84.84 0 0 1-.35.94z"/>
+              </svg>
+              GitLab Repository
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <p style="margin-top: 0.5rem; color: var(--pico-muted-color); font-size: 0.9rem;">
+        Rigorous, reproducible benchmarks executed inside an isolated Alpine Linux container. Comparing out-of-the-box ergonomics against maximum throughput race-mode implementations.
+      </p>
+
+      <div style="font-size: 0.8rem; color: var(--pico-muted-color); background: rgba(0,0,0,0.15); padding: 0.5rem 1rem; border-radius: var(--pico-border-radius); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem;">
+        <span><strong>Environment:</strong> <span id="host-specs">Loading specs...</span></span>
+        <span><strong>Last Run:</strong> <span id="run-timestamp">-</span></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Suite Tabs (Multi-Benchmark Extensibility) -->
+    <div id="suite-nav" role="group" style="margin-bottom: 1.5rem;"></div>
+
+    <!-- Active Suite Header -->
+    <section style="margin-bottom: 2rem;">
+      <h2 id="suite-title" style="margin-bottom: 0.25rem;">-</h2>
+      <p id="suite-description" style="color: var(--pico-muted-color); margin-bottom: 1.5rem;">-</p>
+
+      <!-- Mode Switcher -->
+      <div class="mode-toggle">
+        <div class="segmented-control">
+          <button data-mode-btn="optimized" class="active">⚡ Race Mode (Optimized)</button>
+          <button data-mode-btn="naive">📦 Out of the Box (Naive)</button>
+        </div>
+      </div>
+
+      <!-- Stat Summary Cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="label">Fastest Runtime</div>
+          <div class="value" id="stat-fastest-val" style="color: #10b981;">-</div>
+          <div class="subtext" id="stat-fastest-name">-</div>
+          <div class="subtext" id="stat-fastest-sub">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Average Median Time</div>
+          <div class="value" id="stat-avg-val">-</div>
+          <div class="subtext">Across all runtimes</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Languages Benchmarked</div>
+          <div class="value" id="stat-count-val">-</div>
+          <div class="subtext">15 Polyglot implementations</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Performance Spread</div>
+          <div class="value" id="stat-spread-val" style="color: #f59e0b;">-</div>
+          <div class="subtext">Slowest vs Fastest</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visual Performance Comparison Chart -->
+    <section style="margin-bottom: 3rem;">
+      <article>
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; margin: -1.5rem -1.5rem 1.5rem -1.5rem;">
+          <h3 style="margin: 0; font-size: 1.15rem;">Performance Visualizer</h3>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <label for="category-filter" style="font-size: 0.85rem; margin: 0;">Filter:</label>
+            <select id="category-filter" style="margin: 0; padding: 0.25rem 0.75rem; font-size: 0.85rem;">
+              <option value="all">All Categories</option>
+              <option value="compiled">Compiled Only</option>
+              <option value="jit">JIT / VM Only</option>
+              <option value="interpreted">Interpreted Only</option>
+            </select>
+          </div>
+        </header>
+        <div id="chart-bars"></div>
+      </article>
+    </section>
+
+    <!-- Leaderboard Table -->
+    <section style="margin-bottom: 3rem;">
+      <h3>Leaderboard & Execution Details</h3>
+      <div style="overflow-x: auto;">
+        <table class="benchmark-table">
+          <thead>
+            <tr>
+              <th style="width: 4rem;">Rank</th>
+              <th>Language & Runtime</th>
+              <th>Category</th>
+              <th>Execution Time (Median)</th>
+              <th>Speedup Factor</th>
+              <th>Peak RAM (RSS)</th>
+              <th style="text-align: right;">Source Code</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <!-- Dynamic Injection -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Methodology & Technical Notes -->
+    <section style="margin-bottom: 4rem;">
+      <details>
+        <summary role="button" class="outline secondary"><strong>📖 Benchmark Methodology & Reproducibility</strong></summary>
+        <div style="padding-top: 1rem;">
+          <h4>Measurement Protocol</h4>
+          <ul>
+            <li>Every benchmark implementation generates numbers <code>0..999,999</code> and writes formatted lines to standard output redirected to <code>/dev/null</code>.</li>
+            <li>All runs execute inside an unprivileged Alpine Linux container (<code>benchmarks-env</code>) using the same kernel and CPU allocation.</li>
+            <li><strong>Naive Mode</strong>: Uses standard idiomatic language print/loop statements with standard defaults.</li>
+            <li><strong>Optimized (Race Mode)</strong>: Uses maximal chunked buffered I/O, syscall batching, release compiler optimizations (<code>-O3</code>, <code>--release</code>), and fast integer formatting.</li>
+          </ul>
+
+          <h4>How to Run Locally</h4>
+          <pre><code># Build container image with all runtimes
+make build-env
+
+# Execute the full benchmark suite
+make bench
+
+# Generate static dashboard into public/
+make site</code></pre>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <!-- Source Code Inspector Modal -->
+  <dialog id="code-modal">
+    <article>
+      <header>
+        <button aria-label="Close" rel="prev" onclick="closeCodeModal()"></button>
+        <h4 id="modal-lang-title" style="margin: 0;">Code Inspection</h4>
+      </header>
+      <p style="font-size: 0.85rem; color: var(--pico-muted-color); margin-bottom: 0.5rem;">
+        Execution Command: <code id="modal-run-cmd"></code>
+      </p>
+      <pre><code id="modal-code"></code></pre>
+      <footer>
+        <button class="secondary" onclick="closeCodeModal()">Close</button>
+      </footer>
+    </article>
+  </dialog>
+
+  <footer>
+    <div class="container">
+      <p>Polyglot Benchmark Suite &bull; Maintained by <a href="https://gitlab.com/renich" target="_blank" rel="noopener">Rénich Bon Ćirić</a> &bull; Built with Pico CSS v2 & Alpine Linux</p>
+    </div>
+  </footer>
+
+  <!-- Embedded Data Injection Point (filled by generator or fetched dynamically) -->
+  <script>
+    /* __BENCHMARK_DATA_INJECTION__ */
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

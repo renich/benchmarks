@@ -1,73 +1,140 @@
-all: c.result cpp.result crystal.result go.result haskell.result java.result nim.result perl.result php.result python3.result rakudo.result ruby.result rust.result
+SHELL := /bin/bash
+.SHELLFLAGS := -euo pipefail -c
+.DEFAULT_GOAL := all
 
-c.result: one_million.c
-	clang -o one_million_c one_million.c > /dev/null
-	time ./one_million_c > /dev/null
-	echo
+.PHONY: all naive optimized clean \
+        c.naive cpp.naive crystal.naive go.naive haskell.naive java.naive js.naive nim.naive perl.naive php.naive python3.naive r.naive raku.naive ruby.naive rust.naive \
+        c.opt cpp.opt crystal.opt go.opt haskell.opt java.opt js.opt nim.opt perl.opt php.opt python3.opt r.opt raku.opt ruby.opt rust.opt
 
-cpp.result: one_million.cpp
-	clang++ -o one_million_cpp one_million.cpp > /dev/null
-	time ./one_million_cpp > /dev/null
-	echo
-	clang++ -o one_million_ash_cpp one_million_ash.cpp > /dev/null
-	time ./one_million_ash_cpp > /dev/null
-	echo
+all: optimized naive
 
-crystal.result: one_million.cr
-	crystal build --release --no-debug -o one_million_cr one_million.cr
-	time ./one_million_cr > /dev/null
-	echo
+# --- OPTIMIZED (RACE MODE) ---
+optimized: c.opt cpp.opt crystal.opt go.opt haskell.opt java.opt js.opt nim.opt perl.opt php.opt python3.opt r.opt raku.opt ruby.opt rust.opt
 
-go.result: one_million.go
-	go build -o one_million_go one_million.go
-	time ./one_million_go > /dev/null
-	echo
+c.opt:
+	@mkdir -p optimized/_build
+	clang -O3 -o optimized/_build/bin_c optimized/one_million.c
+	time ./optimized/_build/bin_c > /dev/null
 
-haskell.result: one_million.hs
-	ghc -o one_million_haskell one_million.hs
-	time ./one_million_haskell > /dev/null
-	echo
+cpp.opt:
+	@mkdir -p optimized/_build
+	clang++ -O3 -o optimized/_build/bin_cpp optimized/one_million.cpp
+	time ./optimized/_build/bin_cpp > /dev/null
 
-java.result: one_million.java
-	javac one_million.java
-	time java OneMillion > /dev/null
-	echo
+crystal.opt:
+	@mkdir -p optimized/_build
+	crystal build --release --no-debug -o optimized/_build/bin_cr optimized/one_million.cr
+	time ./optimized/_build/bin_cr > /dev/null
 
-javascript.result: one_million.js
-	time node one_million.js > /dev/null
-	echo
+go.opt:
+	@mkdir -p optimized/_build
+	go build -o optimized/_build/bin_go optimized/one_million.go
+	time ./optimized/_build/bin_go > /dev/null
 
-nim.result: one_million.nim
-	nim c --cc:clang -d:danger --verbosity:0 --hints:off -o:one_million_nim one_million.nim
-	time ./one_million_nim > /dev/null
-	echo
+haskell.opt:
+	@mkdir -p optimized/_build
+	ghc -O2 -v0 -outputdir optimized/_build -o optimized/_build/bin_hs optimized/one_million.hs
+	time ./optimized/_build/bin_hs > /dev/null
 
-perl.result: one_million.pl
-	time perl one_million.pl > /dev/null
-	echo
+java.opt:
+	@mkdir -p optimized/_build
+	javac -d optimized/_build optimized/one_million.java
+	time java -cp optimized/_build OneMillion > /dev/null
 
-php.result: one_million.phps
-	time php one_million.phps > /dev/null
-	echo
+js.opt:
+	time node optimized/one_million.js > /dev/null
 
-python3.result: one_million.py3
-	time python3 one_million.py3 > /dev/null
-	echo
+nim.opt:
+	@mkdir -p optimized/_build
+	nim c --cc:clang -d:release --verbosity:0 --hints:off --nimcache:optimized/_build/nimcache -o:optimized/_build/bin_nim optimized/one_million.nim
+	time ./optimized/_build/bin_nim > /dev/null
 
-rakudo.result: one_million.p6
-	time perl6 -o one_million_rakudo one_million.p6 > /dev/null
-	echo
+perl.opt:
+	time perl optimized/one_million.pl > /dev/null
 
-ruby.result: one_million.rb
-	time ruby --jit one_million.rb > /dev/null
-	echo
+php.opt:
+	time php optimized/one_million.phps > /dev/null
 
-rust.result: one_million.rs
-	rustc -o one_million_rust one_million.rs > /dev/null
-	time ./one_million_rust > /dev/null
-	echo
+python3.opt:
+	time python3 optimized/one_million.py3 > /dev/null
+
+r.opt:
+	time Rscript optimized/one_million.R > /dev/null
+
+raku.opt:
+	time rakudo optimized/one_million.p6 > /dev/null
+
+ruby.opt:
+	time ruby optimized/one_million.rb > /dev/null
+
+rust.opt:
+	@mkdir -p optimized/_build
+	rustc -O -o optimized/_build/bin_rust optimized/one_million.rs
+	time ./optimized/_build/bin_rust > /dev/null
+
+# --- NAIVE (OUT-OF-THE-BOX MODE) ---
+naive: c.naive cpp.naive crystal.naive go.naive haskell.naive java.naive js.naive nim.naive perl.naive php.naive python3.naive r.naive raku.naive ruby.naive rust.naive
+
+c.naive:
+	@mkdir -p naive/_build
+	clang -O3 -o naive/_build/bin_c naive/one_million.c
+	time ./naive/_build/bin_c > /dev/null
+
+cpp.naive:
+	@mkdir -p naive/_build
+	clang++ -O3 -o naive/_build/bin_cpp naive/one_million.cpp
+	time ./naive/_build/bin_cpp > /dev/null
+
+crystal.naive:
+	@mkdir -p naive/_build
+	crystal build --release --no-debug -o naive/_build/bin_cr naive/one_million.cr
+	time ./naive/_build/bin_cr > /dev/null
+
+go.naive:
+	@mkdir -p naive/_build
+	go build -o naive/_build/bin_go naive/one_million.go
+	time ./naive/_build/bin_go > /dev/null
+
+haskell.naive:
+	@mkdir -p naive/_build
+	ghc -O2 -v0 -outputdir naive/_build -o naive/_build/bin_hs naive/one_million.hs
+	time ./naive/_build/bin_hs > /dev/null
+
+java.naive:
+	@mkdir -p naive/_build
+	javac -d naive/_build naive/one_million.java
+	time java -cp naive/_build OneMillion > /dev/null
+
+js.naive:
+	time node naive/one_million.js > /dev/null
+
+nim.naive:
+	@mkdir -p naive/_build
+	nim c --cc:clang -d:release --verbosity:0 --hints:off --nimcache:naive/_build/nimcache -o:naive/_build/bin_nim naive/one_million.nim
+	time ./naive/_build/bin_nim > /dev/null
+
+perl.naive:
+	time perl naive/one_million.pl > /dev/null
+
+php.naive:
+	time php naive/one_million.phps > /dev/null
+
+python3.naive:
+	time python3 naive/one_million.py3 > /dev/null
+
+r.naive:
+	time Rscript naive/one_million.R > /dev/null
+
+raku.naive:
+	time rakudo naive/one_million.p6 > /dev/null
+
+ruby.naive:
+	time ruby naive/one_million.rb > /dev/null
+
+rust.naive:
+	@mkdir -p naive/_build
+	rustc -O -o naive/_build/bin_rust naive/one_million.rs
+	time ./naive/_build/bin_rust > /dev/null
 
 clean:
-	rm -f one_million_ash_cpp one_million_c OneMillion.class one_million_cpp one_million_cr one_million_go one_million_haskell one_million.hi one_million_nim one_million_rust one_million.o
-
-.PHONY: clean
+	rm -rf naive/_build optimized/_build
