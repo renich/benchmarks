@@ -141,6 +141,20 @@ function updateSuiteActiveState() {
   }
 }
 
+function formatDurationMs(seconds) {
+  if (seconds === undefined || seconds === null || isNaN(seconds)) return "-";
+  const ms = seconds * 1000.0;
+  if (ms < 1.0) {
+    return `${ms.toFixed(2)} ms`;
+  } else if (ms < 100.0) {
+    return `${ms.toFixed(1)} ms`;
+  } else if (ms < 1000.0) {
+    return `${ms.toFixed(1)} ms`;
+  } else {
+    return `${ms.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ms`;
+  }
+}
+
 function renderDashboard() {
   const suite = benchmarkData.suites[currentSuiteId];
   if (!suite) return;
@@ -167,13 +181,13 @@ function renderStatCards(modeData) {
   const fastest = modeData[0];
   const slowest = modeData[modeData.length - 1];
   const medianTimes = modeData.map((d) => d.stats.median_seconds);
-  const avgMedian = (medianTimes.reduce((a, b) => a + b, 0) / medianTimes.length).toFixed(3);
+  const avgMedian = medianTimes.reduce((a, b) => a + b, 0) / medianTimes.length;
 
   document.getElementById("stat-fastest-name").textContent = fastest.name;
-  document.getElementById("stat-fastest-val").textContent = `${fastest.stats.median_seconds}s`;
+  document.getElementById("stat-fastest-val").textContent = formatDurationMs(fastest.stats.median_seconds);
   document.getElementById("stat-fastest-sub").textContent = fastest.version || "";
 
-  document.getElementById("stat-avg-val").textContent = `${avgMedian}s`;
+  document.getElementById("stat-avg-val").textContent = formatDurationMs(avgMedian);
   document.getElementById("stat-count-val").textContent = modeData.length;
 
   const maxSpeedup = (slowest.stats.median_seconds / (fastest.stats.median_seconds || 0.0001)).toFixed(1);
@@ -197,7 +211,7 @@ function renderVisualCharts(data, allModeData) {
     return;
   }
 
-  const maxTime = Math.max(...allModeData.map((d) => d.stats.median_seconds), 0.001);
+  const maxTime = Math.max(...allModeData.map((d) => d.stats.median_seconds), 0.0001);
 
   data.forEach((item) => {
     const catClass = getCategoryClass(item.category);
@@ -208,7 +222,7 @@ function renderVisualCharts(data, allModeData) {
     row.innerHTML = `
       <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
         <span style="font-weight: 600;">#${item.rank} ${item.name}</span>
-        <span style="font-family: monospace; color: var(--pico-muted-color);">${item.stats.median_seconds}s (${item.speedup_factor}x)</span>
+        <span style="font-family: monospace; color: var(--pico-muted-color);">${formatDurationMs(item.stats.median_seconds)} (${item.speedup_factor}x)</span>
       </div>
       <div class="bar-track">
         <div class="bar-fill bar-${catClass}" style="width: ${pct}%;"></div>
@@ -246,9 +260,9 @@ function renderLeaderboardTable(data) {
         <span class="badge badge-${catClass}">${item.category}</span>
       </td>
       <td>
-        <strong style="font-family: monospace; font-size: 0.95rem;">${item.stats.median_seconds}s</strong>
+        <strong style="font-family: monospace; font-size: 0.95rem;">${formatDurationMs(item.stats.median_seconds)}</strong>
         <br>
-        <small style="color: var(--pico-muted-color); font-family: monospace; font-size: 0.75rem;">[${item.stats.min_seconds}s – ${item.stats.max_seconds}s]</small>
+        <small style="color: var(--pico-muted-color); font-family: monospace; font-size: 0.75rem;">[${formatDurationMs(item.stats.min_seconds)} – ${formatDurationMs(item.stats.max_seconds)}]</small>
       </td>
       <td>
         <span class="speedup-pill" style="color: ${item.rank === 1 ? 'var(--pico-primary)' : 'var(--pico-color)'}">

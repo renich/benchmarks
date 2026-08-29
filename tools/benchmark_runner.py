@@ -258,6 +258,10 @@ def run_benchmark_command(cmd, work_dir, runs=3):
         "stddev_seconds": round(stddev_time, 4),
         "min_seconds": round(min_time, 4),
         "max_seconds": round(max_time, 4),
+        "mean_ms": round(mean_time * 1000.0, 2),
+        "median_ms": round(median_time * 1000.0, 2),
+        "min_ms": round(min_time * 1000.0, 2),
+        "max_ms": round(max_time * 1000.0, 2),
         "runs": runs,
         "raw_times": [round(t, 4) for t in times],
         "max_rss_mb": round(max(max_rss_list), 2),
@@ -328,7 +332,7 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
         "suite_id": suite_id,
         "title": suite_id.replace("_", " ").title(),
         "description": "Benchmark suite",
-        "unit": "seconds (lower is faster)",
+        "unit": "milliseconds (lower is faster)",
         "modes": {},
     }
 
@@ -391,7 +395,7 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
                     "run_command": run_cmd,
                 }
                 mode_results.append(entry)
-                print(f"Done! Median: {bench_stats['median_seconds']}s (Min: {bench_stats['min_seconds']}s, Max: {bench_stats['max_seconds']}s)")
+                print(f"Done! Median: {bench_stats['median_ms']}ms (Min: {bench_stats['min_ms']}ms, Max: {bench_stats['max_ms']}ms)")
 
             except Exception as e:
                 print(f"FAILED: {e}")
