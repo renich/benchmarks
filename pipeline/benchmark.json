@@ -1,0 +1,8 @@
+{
+  "id": "pipeline",
+  "title": "Concurrent Producer-Consumer Pipeline",
+  "description": "Multi-stage concurrent pipeline: 1 Producer pushes 100k tasks into a bounded queue (cap=1000) -> 8 Workers compute FNV-1a checksums -> 1 Aggregator tallies totals and validates state.",
+  "category": "Concurrency & Synchronization",
+  "unit": "seconds",
+  "modes": ["optimized", "naive"]
+}

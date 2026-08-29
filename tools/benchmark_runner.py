@@ -17,28 +17,28 @@ import sys
 import time
 from pathlib import Path
 
-# Suite Language Definitions and Command Configs
-LANGUAGE_CONFIGS = {
+# Suite Language Definitions and Command Configs (Dynamic per suite)
+LANGUAGE_TEMPLATES = {
     "c": {
         "name": "C",
         "category": "Compiled",
-        "file": "one_million.c",
-        "compile": "clang -O3 -o {bin} {src}",
+        "ext": "c",
+        "compile": "clang -O3 -pthread -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "clang --version | head -n 1",
     },
     "cpp": {
         "name": "C++",
         "category": "Compiled",
-        "file": "one_million.cpp",
-        "compile": "clang++ -O3 -o {bin} {src}",
+        "ext": "cpp",
+        "compile": "clang++ -O3 -std=c++20 -pthread -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "clang++ --version | head -n 1",
     },
     "crystal": {
         "name": "Crystal",
         "category": "Compiled",
-        "file": "one_million.cr",
+        "ext": "cr",
         "compile": "crystal build --release --no-debug -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "crystal --version | head -n 1",
@@ -46,7 +46,7 @@ LANGUAGE_CONFIGS = {
     "go": {
         "name": "Go",
         "category": "Compiled",
-        "file": "one_million.go",
+        "ext": "go",
         "compile": "go build -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "go version",
@@ -54,7 +54,7 @@ LANGUAGE_CONFIGS = {
     "haskell": {
         "name": "Haskell",
         "category": "Compiled",
-        "file": "one_million.hs",
+        "ext": "hs",
         "compile": "ghc -O2 -v0 -outputdir {out_dir} -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "ghc --version | head -n 1",
@@ -62,15 +62,15 @@ LANGUAGE_CONFIGS = {
     "java": {
         "name": "Java",
         "category": "JIT / VM",
-        "file": "one_million.java",
+        "ext": "java",
         "compile": "javac -d {out_dir} {src}",
-        "run": "java -cp {out_dir} OneMillion",
+        "run": "java -cp {out_dir} {java_class}",
         "version_cmd": "java --version | head -n 1",
     },
     "javascript": {
         "name": "JavaScript (Node)",
         "category": "JIT",
-        "file": "one_million.js",
+        "ext": "js",
         "compile": None,
         "run": "node {src}",
         "version_cmd": "node --version",
@@ -78,7 +78,7 @@ LANGUAGE_CONFIGS = {
     "nim": {
         "name": "Nim",
         "category": "Compiled",
-        "file": "one_million.nim",
+        "ext": "nim",
         "compile": "nim c --cc:clang -d:release --verbosity:0 --hints:off --nimcache:{out_dir}/nimcache -o:{bin} {src}",
         "run": "{bin}",
         "version_cmd": "nim --version | head -n 1",
@@ -86,7 +86,7 @@ LANGUAGE_CONFIGS = {
     "php": {
         "name": "PHP",
         "category": "Interpreted",
-        "file": "one_million.phps",
+        "ext": "phps",
         "compile": None,
         "run": "php {src}",
         "version_cmd": "php --version | head -n 1",
@@ -94,7 +94,7 @@ LANGUAGE_CONFIGS = {
     "perl": {
         "name": "Perl",
         "category": "Interpreted",
-        "file": "one_million.pl",
+        "ext": "pl",
         "compile": None,
         "run": "perl {src}",
         "version_cmd": "perl --version | grep -m1 'This is perl'",
@@ -102,7 +102,7 @@ LANGUAGE_CONFIGS = {
     "python3": {
         "name": "Python 3",
         "category": "Interpreted",
-        "file": "one_million.py3",
+        "ext": "py3",
         "compile": None,
         "run": "python3 {src}",
         "version_cmd": "python3 --version",
@@ -110,7 +110,7 @@ LANGUAGE_CONFIGS = {
     "r": {
         "name": "R",
         "category": "Interpreted",
-        "file": "one_million.R",
+        "ext": "R",
         "compile": None,
         "run": "Rscript {src}",
         "version_cmd": "Rscript --version 2>&1 | head -n 1",
@@ -118,7 +118,7 @@ LANGUAGE_CONFIGS = {
     "raku": {
         "name": "Raku",
         "category": "Interpreted",
-        "file": "one_million.p6",
+        "ext": "p6",
         "compile": None,
         "run": "rakudo {src}",
         "version_cmd": "rakudo --version | head -n 1",
@@ -126,7 +126,7 @@ LANGUAGE_CONFIGS = {
     "ruby": {
         "name": "Ruby",
         "category": "Interpreted",
-        "file": "one_million.rb",
+        "ext": "rb",
         "compile": None,
         "run": "ruby {src}",
         "version_cmd": "ruby --version | head -n 1",
@@ -134,7 +134,7 @@ LANGUAGE_CONFIGS = {
     "rust": {
         "name": "Rust",
         "category": "Compiled",
-        "file": "one_million.rs",
+        "ext": "rs",
         "compile": "rustc -O -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "rustc --version",
@@ -189,10 +189,6 @@ def get_tool_version(version_cmd):
 
 
 def run_benchmark_command(cmd, work_dir, runs=3):
-    """
-    Executes command with stdout redirected to /dev/null,
-    measuring wall time, user time, system time, and max RSS (KB).
-    """
     times = []
     user_times = []
     sys_times = []
@@ -243,15 +239,33 @@ def run_benchmark_command(cmd, work_dir, runs=3):
     }
 
 
-def compile_implementation(lang_key, config, mode_dir, out_dir):
-    src_file = mode_dir / config["file"]
-    if not src_file.exists():
-        return None, f"Source file {src_file} does not exist"
+def find_source_file(mode_dir, suite_name, ext):
+    candidates = [
+        mode_dir / f"{suite_name}.{ext}",
+        mode_dir / f"{suite_name.capitalize()}.{ext}",
+        mode_dir / f"{suite_name.title().replace('_', '')}.{ext}",
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    # Fallback to any file with matching extension in mode_dir
+    matches = list(mode_dir.glob(f"*.{ext}"))
+    if matches:
+        return matches[0]
+    return None
+
+
+def compile_implementation(lang_key, config, suite_name, mode_dir, out_dir):
+    src_file = find_source_file(mode_dir, suite_name, config["ext"])
+    if not src_file:
+        return None, None, f"No source file with ext .{config['ext']} found in {mode_dir}"
 
     bin_name = f"bin_{lang_key}"
     bin_path = (out_dir / bin_name).resolve()
     src_abs = src_file.resolve()
     out_dir_abs = out_dir.resolve()
+
+    java_class = src_file.stem
 
     compile_cmd = config["compile"]
     if compile_cmd:
@@ -259,19 +273,26 @@ def compile_implementation(lang_key, config, mode_dir, out_dir):
             bin=str(bin_path),
             src=str(src_abs),
             out_dir=str(out_dir_abs),
+            java_class=java_class,
         )
         res = subprocess.run(
             cmd, shell=True, cwd=str(out_dir_abs), capture_output=True, text=True
         )
         if res.returncode != 0:
-            return None, f"Compilation failed: {res.stderr.strip()}"
+            return None, None, f"Compilation failed: {res.stderr.strip()}"
+
+    if lang_key == "java" and out_dir_abs.exists():
+        classes = [f.stem for f in out_dir_abs.glob("*.class") if "$" not in f.stem]
+        if classes:
+            java_class = classes[0]
 
     run_cmd = config["run"].format(
         bin=str(bin_path),
         src=str(src_abs),
         out_dir=str(out_dir_abs),
+        java_class=java_class,
     )
-    return run_cmd, None
+    return run_cmd, src_file, None
 
 
 def run_suite(suite_dir, runs=3, selected_languages=None):
@@ -280,8 +301,8 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
 
     results = {
         "suite_id": suite_id,
-        "title": "One Million Lines I/O",
-        "description": "Sequential loop generating numbers 0..999,999 and printing formatted lines to standard output (/dev/null).",
+        "title": suite_id.replace("_", " ").title(),
+        "description": "Benchmark suite",
         "unit": "seconds (lower is faster)",
         "modes": {},
     }
@@ -289,7 +310,7 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
     metadata_file = suite_path / "benchmark.json"
     if metadata_file.exists():
         try:
-            meta = json.loads(metadata_file.read_text())
+            meta = json.loads(metadata_file.read_text(encoding="utf-8"))
             results["title"] = meta.get("title", results["title"])
             results["description"] = meta.get("description", results["description"])
         except Exception:
@@ -309,19 +330,19 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
 
         mode_results = []
 
-        for lang_key, config in LANGUAGE_CONFIGS.items():
+        for lang_key, config in LANGUAGE_TEMPLATES.items():
             if selected_languages and lang_key not in selected_languages:
                 continue
 
-            src_file = mode_dir / config["file"]
-            if not src_file.exists():
-                print(f"[-] Skipping {config['name']} (missing {config['file']})")
+            src_file = find_source_file(mode_dir, suite_id, config["ext"])
+            if not src_file:
+                print(f"[-] Skipping {config['name']} (no .{config['ext']} file)")
                 continue
 
             print(f"[*] Benchmarking {config['name']} ({config['category']})... ", end="", flush=True)
 
             try:
-                run_cmd, error = compile_implementation(lang_key, config, mode_dir, build_dir)
+                run_cmd, actual_src, error = compile_implementation(lang_key, config, suite_id, mode_dir, build_dir)
                 if error:
                     print(f"COMPILE ERROR: {error}")
                     continue
@@ -329,14 +350,13 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
                 bench_stats = run_benchmark_command(run_cmd, build_dir, runs=runs)
                 version_str = get_tool_version(config["version_cmd"])
 
-                # Read source code snippet for UI inspection
-                source_code = src_file.read_text(encoding="utf-8")
+                source_code = actual_src.read_text(encoding="utf-8")
 
                 entry = {
                     "id": lang_key,
                     "name": config["name"],
                     "category": config["category"],
-                    "file": config["file"],
+                    "file": actual_src.name,
                     "version": version_str,
                     "stats": bench_stats,
                     "source_code": source_code,
@@ -366,28 +386,51 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
     return results
 
 
+def discover_suites(base_dir):
+    base_path = Path(base_dir).resolve()
+    suites = []
+    for item in sorted(base_path.iterdir()):
+        if item.is_dir() and (item / "benchmark.json").exists():
+            suites.append(item)
+    return suites
+
+
 def main():
     parser = argparse.ArgumentParser(description="Multi-language benchmark runner")
-    parser.add_argument("--suite", default="one_million", help="Benchmark suite directory to run")
+    parser.add_argument("--suite", default="all", help="Suite directory or 'all' for all discovered suites")
     parser.add_argument("--runs", type=int, default=3, help="Number of iterations per implementation")
     parser.add_argument("--lang", nargs="*", help="Specific languages to benchmark")
     parser.add_argument("--output", default="benchmark_data.json", help="Path to write JSON results")
 
     args = parser.parse_args()
+    base_dir = Path(".").resolve()
+
+    if args.suite == "all":
+        suites_to_run = discover_suites(base_dir)
+        if not suites_to_run:
+            # Fallback
+            suites_to_run = [base_dir / "one_million"]
+    else:
+        suite_path = (base_dir / args.suite).resolve()
+        if not suite_path.exists():
+            raise FileNotFoundError(f"Suite directory '{args.suite}' does not exist.")
+        suites_to_run = [suite_path]
 
     specs = get_system_specs()
-    suite_data = run_suite(args.suite, runs=args.runs, selected_languages=args.lang)
+    suites_data = {}
+
+    for s_path in suites_to_run:
+        suite_res = run_suite(s_path, runs=args.runs, selected_languages=args.lang)
+        suites_data[suite_res["suite_id"]] = suite_res
 
     output_payload = {
         "system": specs,
-        "suites": {
-            suite_data["suite_id"]: suite_data
-        }
+        "suites": suites_data,
     }
 
     out_file = Path(args.output).resolve()
     out_file.write_text(json.dumps(output_payload, indent=2), encoding="utf-8")
-    print(f"\n[+] Benchmark complete! Results written to {out_file}")
+    print(f"\n[+] All benchmarks complete! Results written to {out_file}")
 
 
 if __name__ == "__main__":
