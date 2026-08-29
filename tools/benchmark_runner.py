@@ -24,6 +24,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Compiled",
         "ext": "c",
         "compile": "clang -O3 -pthread -o {bin} {src}",
+        "compile_opt": "clang -O3 -march=native -mtune=native -pthread -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "clang --version | head -n 1",
     },
@@ -32,6 +33,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Compiled",
         "ext": "cpp",
         "compile": "clang++ -O3 -std=c++20 -pthread -o {bin} {src}",
+        "compile_opt": "clang++ -O3 -march=native -mtune=native -std=c++20 -pthread -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "clang++ --version | head -n 1",
     },
@@ -40,6 +42,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Compiled",
         "ext": "cr",
         "compile": "crystal build --release --no-debug -o {bin} {src}",
+        "compile_opt": "crystal build --release --mcpu=native --no-debug -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "crystal --version | head -n 1",
     },
@@ -48,6 +51,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Compiled",
         "ext": "go",
         "compile": "go build -o {bin} {src}",
+        "compile_opt": "go build -ldflags='-s -w' -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "go version",
     },
@@ -56,6 +60,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Compiled",
         "ext": "hs",
         "compile": "ghc -O2 -v0 -outputdir {out_dir} -o {bin} {src}",
+        "compile_opt": "ghc -O2 -optc-march=native -v0 -outputdir {out_dir} -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "ghc --version | head -n 1",
     },
@@ -64,6 +69,7 @@ LANGUAGE_TEMPLATES = {
         "category": "JIT / VM",
         "ext": "java",
         "compile": "javac -d {out_dir} {src}",
+        "compile_opt": "javac -d {out_dir} {src}",
         "run": "java -cp {out_dir} {java_class}",
         "version_cmd": "java --version | head -n 1",
     },
@@ -72,6 +78,7 @@ LANGUAGE_TEMPLATES = {
         "category": "JIT",
         "ext": "js",
         "compile": None,
+        "compile_opt": None,
         "run": "node {src}",
         "version_cmd": "node --version",
     },
@@ -80,6 +87,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Compiled",
         "ext": "nim",
         "compile": "nim c --cc:clang -d:release --verbosity:0 --hints:off --nimcache:{out_dir}/nimcache -o:{bin} {src}",
+        "compile_opt": "nim c --cc:clang -d:release -d:danger --passC:-march=native --verbosity:0 --hints:off --nimcache:{out_dir}/nimcache -o:{bin} {src}",
         "run": "{bin}",
         "version_cmd": "nim --version | head -n 1",
     },
@@ -88,6 +96,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Interpreted",
         "ext": "phps",
         "compile": None,
+        "compile_opt": None,
         "run": "php {src}",
         "version_cmd": "php --version | head -n 1",
     },
@@ -96,6 +105,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Interpreted",
         "ext": "pl",
         "compile": None,
+        "compile_opt": None,
         "run": "perl {src}",
         "version_cmd": "perl --version | grep -m1 'This is perl'",
     },
@@ -104,6 +114,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Interpreted",
         "ext": "py3",
         "compile": None,
+        "compile_opt": None,
         "run": "python3 {src}",
         "version_cmd": "python3 --version",
     },
@@ -112,6 +123,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Interpreted",
         "ext": "R",
         "compile": None,
+        "compile_opt": None,
         "run": "Rscript {src}",
         "version_cmd": "Rscript --version 2>&1 | head -n 1",
     },
@@ -120,6 +132,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Interpreted",
         "ext": "p6",
         "compile": None,
+        "compile_opt": None,
         "run": "rakudo {src}",
         "version_cmd": "rakudo --version | head -n 1",
     },
@@ -128,6 +141,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Interpreted",
         "ext": "rb",
         "compile": None,
+        "compile_opt": None,
         "run": "ruby {src}",
         "version_cmd": "ruby --version | head -n 1",
     },
@@ -136,6 +150,7 @@ LANGUAGE_TEMPLATES = {
         "category": "Compiled",
         "ext": "rs",
         "compile": "rustc -O -o {bin} {src}",
+        "compile_opt": "rustc -O -C target-cpu=native -o {bin} {src}",
         "run": "{bin}",
         "version_cmd": "rustc --version",
     },
@@ -255,7 +270,7 @@ def find_source_file(mode_dir, suite_name, ext):
     return None
 
 
-def compile_implementation(lang_key, config, suite_name, mode_dir, out_dir):
+def compile_implementation(lang_key, config, suite_name, mode, mode_dir, out_dir):
     src_file = find_source_file(mode_dir, suite_name, config["ext"])
     if not src_file:
         return None, None, f"No source file with ext .{config['ext']} found in {mode_dir}"
@@ -267,7 +282,7 @@ def compile_implementation(lang_key, config, suite_name, mode_dir, out_dir):
 
     java_class = src_file.stem
 
-    compile_cmd = config["compile"]
+    compile_cmd = config.get("compile_opt") if mode == "optimized" and config.get("compile_opt") else config.get("compile")
     if compile_cmd:
         cmd = compile_cmd.format(
             bin=str(bin_path),
@@ -313,8 +328,11 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
             meta = json.loads(metadata_file.read_text(encoding="utf-8"))
             results["title"] = meta.get("title", results["title"])
             results["description"] = meta.get("description", results["description"])
-        except Exception:
-            pass
+            setup_cmd = meta.get("setup_cmd")
+            if setup_cmd:
+                subprocess.run(setup_cmd, shell=True, check=False)
+        except Exception as e:
+            print(f"[!] Suite setup warning: {e}")
 
     for mode in ["optimized", "naive"]:
         mode_dir = suite_path / mode
@@ -342,7 +360,7 @@ def run_suite(suite_dir, runs=3, selected_languages=None):
             print(f"[*] Benchmarking {config['name']} ({config['category']})... ", end="", flush=True)
 
             try:
-                run_cmd, actual_src, error = compile_implementation(lang_key, config, suite_id, mode_dir, build_dir)
+                run_cmd, actual_src, error = compile_implementation(lang_key, config, suite_id, mode, mode_dir, build_dir)
                 if error:
                     print(f"COMPILE ERROR: {error}")
                     continue
@@ -408,7 +426,6 @@ def main():
     if args.suite == "all":
         suites_to_run = discover_suites(base_dir)
         if not suites_to_run:
-            # Fallback
             suites_to_run = [base_dir / "one_million"]
     else:
         suite_path = (base_dir / args.suite).resolve()

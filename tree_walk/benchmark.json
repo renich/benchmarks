@@ -1,0 +1,9 @@
+{
+  "id": "tree_walk",
+  "title": "Parallel Directory Tree Walker & Aggregator",
+  "description": "Traverses a nested hierarchy of 2,500 text files concurrently with 8 workers, scanning for regex error patterns and aggregating match counts.",
+  "category": "I/O & Concurrency",
+  "unit": "seconds",
+  "modes": ["optimized", "naive"],
+  "setup_cmd": "python3 tools/gen_tree.py --output tree_walk/_data --files 2500"
+}

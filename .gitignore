@@ -8,6 +8,10 @@ nimcache/
 one_million_*
 !one_million_ash.cpp
 
+# Generated synthetic benchmark datasets
+_data/
+tree_walk/_data/
+
 # Generated benchmark data & static site outputs
 public/
 benchmark_data.json
