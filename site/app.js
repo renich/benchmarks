@@ -6,7 +6,6 @@ let currentMode = "optimized"; // 'optimized' | 'naive'
 let currentCategoryFilter = "all";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // If data is embedded in window.BENCHMARK_DATA, use it; otherwise fetch data.json
   if (window.BENCHMARK_DATA) {
     benchmarkData = window.BENCHMARK_DATA;
     initDashboard();
@@ -26,8 +25,14 @@ document.addEventListener("DOMContentLoaded", () => {
 function initDashboard() {
   if (!benchmarkData || !benchmarkData.suites) return;
 
+  // Set default suite to first discovered suite if one_million is not present
+  const suites = Object.keys(benchmarkData.suites);
+  if (!suites.includes(currentSuiteId) && suites.length > 0) {
+    currentSuiteId = suites[0];
+  }
+
   renderSystemSpecs(benchmarkData.system);
-  renderSuiteSelector();
+  setupSuiteSelector();
   renderDashboard();
 
   // Attach Mode Switcher handlers
@@ -62,7 +67,7 @@ function renderSystemSpecs(system) {
   }
 }
 
-function renderSuiteSelector() {
+function setupSuiteSelector() {
   const suites = Object.keys(benchmarkData.suites);
   const suiteNav = document.getElementById("suite-nav");
   if (!suiteNav || suites.length <= 1) return;
@@ -71,14 +76,26 @@ function renderSuiteSelector() {
   suites.forEach((suiteId) => {
     const suite = benchmarkData.suites[suiteId];
     const btn = document.createElement("button");
+    btn.id = `tab-btn-${suiteId}`;
     btn.className = suiteId === currentSuiteId ? "active" : "outline";
     btn.textContent = suite.title || suiteId;
     btn.addEventListener("click", () => {
+      if (currentSuiteId === suiteId) return;
       currentSuiteId = suiteId;
-      renderSuiteSelector();
+      updateSuiteSelectorActiveState();
       renderDashboard();
     });
     suiteNav.appendChild(btn);
+  });
+}
+
+function updateSuiteSelectorActiveState() {
+  const suites = Object.keys(benchmarkData.suites);
+  suites.forEach((suiteId) => {
+    const btn = document.getElementById(`tab-btn-${suiteId}`);
+    if (btn) {
+      btn.className = suiteId === currentSuiteId ? "active" : "outline";
+    }
   });
 }
 
@@ -117,7 +134,7 @@ function renderStatCards(modeData) {
   document.getElementById("stat-avg-val").textContent = `${avgMedian}s`;
   document.getElementById("stat-count-val").textContent = modeData.length;
 
-  const maxSpeedup = (slowest.stats.median_seconds / fastest.stats.median_seconds).toFixed(1);
+  const maxSpeedup = (slowest.stats.median_seconds / (fastest.stats.median_seconds || 0.0001)).toFixed(1);
   document.getElementById("stat-spread-val").textContent = `${maxSpeedup}x`;
 }
 
@@ -134,18 +151,18 @@ function renderVisualCharts(data, allModeData) {
   chartContainer.innerHTML = "";
 
   if (data.length === 0) {
-    chartContainer.innerHTML = "<p>No entries match the selected filter.</p>";
+    chartContainer.innerHTML = "<p style='padding: 1rem; color: var(--pico-muted-color);'>No entries match the selected filter.</p>";
     return;
   }
 
-  const maxTime = Math.max(...allModeData.map((d) => d.stats.median_seconds));
+  const maxTime = Math.max(...allModeData.map((d) => d.stats.median_seconds), 0.001);
 
   data.forEach((item) => {
     const catClass = getCategoryClass(item.category);
     const pct = Math.max(1, (item.stats.median_seconds / maxTime) * 100);
 
     const row = document.createElement("div");
-    row.style.marginBottom = "0.75rem";
+    row.className = "chart-bar-row";
     row.innerHTML = `
       <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
         <span style="font-weight: 600;">#${item.rank} ${item.name}</span>
@@ -165,7 +182,7 @@ function renderLeaderboardTable(data) {
   tbody.innerHTML = "";
 
   if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No implementations found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--pico-muted-color);">No implementations found.</td></tr>`;
     return;
   }
 
@@ -181,25 +198,25 @@ function renderLeaderboardTable(data) {
       <td>
         <strong>${item.name}</strong>
         <br>
-        <small style="color: var(--pico-muted-color);">${escapeHtml(item.version || "")}</small>
+        <small style="color: var(--pico-muted-color); font-size: 0.75rem;">${escapeHtml(item.version || "")}</small>
       </td>
       <td>
         <span class="badge badge-${catClass}">${item.category}</span>
       </td>
       <td>
-        <strong style="font-family: monospace; font-size: 1rem;">${item.stats.median_seconds}s</strong>
+        <strong style="font-family: monospace; font-size: 0.95rem;">${item.stats.median_seconds}s</strong>
         <br>
-        <small style="color: var(--pico-muted-color); font-family: monospace;">[${item.stats.min_seconds}s – ${item.stats.max_seconds}s]</small>
+        <small style="color: var(--pico-muted-color); font-family: monospace; font-size: 0.75rem;">[${item.stats.min_seconds}s – ${item.stats.max_seconds}s]</small>
       </td>
       <td>
         <span class="speedup-pill" style="color: ${item.rank === 1 ? 'var(--pico-primary)' : 'var(--pico-color)'}">
           ${item.rank === 1 ? '⚡ 1.0x (Baseline)' : `${item.speedup_factor}x`}
         </span>
       </td>
-      <td style="font-family: monospace;">
+      <td style="font-family: monospace; font-size: 0.9rem;">
         ${item.stats.max_rss_mb ? `${item.stats.max_rss_mb} MB` : 'N/A'}
       </td>
-      <td>
+      <td style="text-align: right;">
         <button class="outline btn-inspect" onclick="openCodeModal('${item.id}')">Inspect</button>
       </td>
     `;

@@ -1,0 +1,8 @@
+{
+  "id": "async_checker",
+  "title": "Async Task Latency & Percentile Checker",
+  "description": "Executes 10,000 concurrent async tasks with simulated latency distributions, aggregating HTTP status codes and calculating P50/P95/P99 latency percentiles.",
+  "category": "Async & Statistics",
+  "unit": "seconds",
+  "modes": ["optimized", "naive"]
+}

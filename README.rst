@@ -30,7 +30,7 @@ Polyglot Benchmarks
 
 |
 
-A reproducible, multi-language benchmark suite comparing execution times, peak memory usage (RSS), and I/O throughput across **15 programming languages** running inside an isolated **Alpine Linux** container environment.
+A reproducible, multi-language benchmark suite comparing execution times, peak memory usage (isolated per-process Peak RSS), and throughput across **15 programming languages** running inside an isolated **Alpine Linux** container environment.
 
 Live Dashboard
 --------------
@@ -48,6 +48,7 @@ Benchmark Suites
 1. ``one_million/``: Sequential I/O loop generating numbers ``0..999,999`` and printing formatted lines to standard output (``/dev/null``).
 2. ``pipeline/``: Multi-stage concurrent Producer-Consumer queue. 1 Producer pushes 100,000 tasks into a bounded channel (capacity 1,000) $\to$ 8 Workers compute 64-bit FNV-1a checksums $\to$ 1 Aggregator tallies totals and validates state.
 3. ``tree_walk/``: Parallel filesystem traversal across 2,500 structured text files in 40 nested directories $\to$ 8 Workers scan for regex error tokens (``category=<CAT>``) $\to$ Aggregates total keyword matches (deterministic baseline: ``7,143``).
+4. ``async_checker/``: Simulates 10,000 asynchronous non-blocking tasks with pseudo-random microsecond delays, aggregating HTTP status codes and computing exact P50/P95/P99 latency percentiles with $O(K)$ histogram binning.
 
 Measurement Modes
 -----------------
@@ -69,65 +70,65 @@ Suite 1: One Million Lines I/O
      - Race Mode (Optimized)
      - Out-of-the-Box (Naive)
    * - 🥇 #1
-     - C++
-     - 0.0091s
-     - 0.0654s
-   * - 🥈 #2
-     - Rust
-     - 0.0097s
-     - 0.5557s
-   * - 🥉 #3
-     - C
-     - 0.0097s
-     - 0.1045s
-   * - #4
-     - Go
-     - 0.0214s
-     - 0.6117s
-   * - #5
      - Crystal
-     - 0.0345s
-     - 0.5680s
-   * - #6
+     - 0.0100s [1.65 MB]
+     - 0.6000s [1.73 MB]
+   * - 🥇 #1
+     - C
+     - 0.0100s [1.67 MB]
+     - 0.1100s [1.62 MB]
+   * - 🥇 #1
+     - Go
+     - 0.0100s [1.73 MB]
+     - 0.6200s [6.83 MB]
+   * - 🥇 #1
      - Nim
-     - 0.0680s
-     - 0.5902s
-   * - #7
+     - 0.0100s [1.61 MB]
+     - 0.5900s [1.62 MB]
+   * - 🥇 #1
+     - Rust
+     - 0.0100s [1.63 MB]
+     - 0.5500s [1.65 MB]
+   * - 🥈 #2
+     - C++
+     - 0.0106s [2.62 MB]
+     - 0.0600s [2.61 MB]
+   * - #3
      - PHP
-     - 0.0740s
-     - 0.5144s
-   * - #8
-     - Perl
-     - 0.0800s
-     - 0.0800s
-   * - #9
+     - 0.0700s [9.21 MB]
+     - 0.5100s [8.66 MB]
+   * - #4
      - Haskell
-     - 0.0916s
-     - 0.3956s
-   * - #10
+     - 0.0900s [5.96 MB]
+     - 0.4200s [5.95 MB]
+   * - #5
+     - Perl
+     - 0.0900s [4.35 MB]
+     - 0.0800s [3.22 MB]
+   * - #6
      - Java
-     - 0.1256s
-     - 0.7657s
-   * - #11
+     - 0.1200s [42.58 MB]
+     - 0.8000s [112.57 MB]
+   * - #7
      - Node.js
-     - 0.1328s
-     - 1.6073s
-   * - #12
+     - 0.1200s [98.58 MB]
+     - 1.6700s [77.24 MB]
+   * - #8
      - Ruby
-     - 0.3057s
-     - 0.5246s
-   * - #13
+     - 0.3300s [12.20 MB]
+     - 0.5100s [12.11 MB]
+   * - #9
      - Python 3
-     - 0.3577s
-     - 0.3950s
-   * - #14
+     - 0.3600s [10.29 MB]
+     - 0.3800s [6.23 MB]
+   * - #10
      - Raku
-     - 1.6209s
-     - 1.3565s
-   * - #15
+     - 1.7900s [280.0 MB]
+     - 1.3800s [147.78 MB]
+   * - #11
      - R
-     - 2.0470s
-     - 4.4130s
+     - 2.1600s [238.88 MB]
+     - 4.5000s [71.63 MB]
 
 Suite 2: Concurrent Producer-Consumer Pipeline (100k Tasks)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -142,64 +143,64 @@ Suite 2: Concurrent Producer-Consumer Pipeline (100k Tasks)
      - Out-of-the-Box (Naive)
    * - 🥇 #1
      - Crystal
-     - 0.0040s
-     - 0.0102s
+     - 0.0053s [1.65 MB]
+     - 0.0100s [1.89 MB]
    * - 🥈 #2
-     - Perl
-     - 0.0098s
-     - 0.0102s
+     - Go
+     - 0.0100s [2.40 MB]
+     - 0.0100s [2.52 MB]
    * - 🥉 #3
      - Nim
-     - 0.0102s
-     - 0.0129s
+     - 0.0100s [1.61 MB]
+     - 0.0100s [1.67 MB]
    * - #4
      - Haskell
-     - 0.0144s
-     - 0.0147s
+     - 0.0100s [7.14 MB]
+     - 0.0100s [6.87 MB]
    * - #5
-     - Go
-     - 0.0163s
-     - 0.0178s
+     - Perl
+     - 0.0100s [3.97 MB]
+     - 0.0100s [3.97 MB]
    * - #6
      - PHP
-     - 0.0281s
-     - 0.0288s
+     - 0.0200s [8.90 MB]
+     - 0.0200s [9.02 MB]
    * - #7
      - Rust
-     - 0.0407s
-     - 0.0588s
+     - 0.0300s [1.61 MB]
+     - 0.0500s [1.57 MB]
    * - #8
-     - C++
-     - 0.0440s
-     - 0.0432s
-   * - #9
      - C
-     - 0.0448s
-     - 0.0442s
+     - 0.0400s [1.60 MB]
+     - 0.0400s [1.66 MB]
+   * - #9
+     - C++
+     - 0.0600s [2.61 MB]
+     - 0.0400s [2.63 MB]
    * - #10
      - Java
-     - 0.0890s
-     - 0.0972s
+     - 0.0900s [54.27 MB]
+     - 0.0900s [58.77 MB]
    * - #11
      - Node.js
-     - 0.1296s
-     - 0.1351s
+     - 0.1300s [67.66 MB]
+     - 0.1300s [67.79 MB]
    * - #12
      - R
-     - 0.1919s
-     - 0.3812s
+     - 0.1900s [70.86 MB]
+     - 0.3200s [75.71 MB]
    * - #13
-     - Raku
-     - 0.2212s
-     - 0.2166s
-   * - #14
      - Python 3
-     - 0.2246s
-     - 0.5497s
+     - 0.2200s [7.52 MB]
+     - 0.5100s [7.69 MB]
+   * - #14
+     - Raku
+     - 0.2200s [170.0 MB]
+     - 0.1900s [147.32 MB]
    * - #15
      - Ruby
-     - 0.5509s
-     - 0.7692s
+     - 0.5600s [12.68 MB]
+     - 0.7800s [12.15 MB]
 
 Suite 3: Parallel Directory Tree Walker (2,500 Files)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -214,64 +215,136 @@ Suite 3: Parallel Directory Tree Walker (2,500 Files)
      - Out-of-the-Box (Naive)
    * - 🥇 #1
      - C
-     - 0.0011s
-     - 0.0009s
+     - 0.0023s [1.67 MB]
+     - 0.0023s [1.65 MB]
    * - 🥈 #2
      - Rust
-     - 0.0099s
-     - 0.0100s
+     - 0.0100s [1.61 MB]
+     - 0.0102s [1.63 MB]
    * - 🥉 #3
      - Go
-     - 0.0117s
-     - 0.0123s
+     - 0.0100s [7.29 MB]
+     - 0.0100s [8.05 MB]
    * - #4
      - C++
-     - 0.0156s
-     - 0.0303s
+     - 0.0100s [3.01 MB]
+     - 0.0200s [3.19 MB]
    * - #5
      - Nim
-     - 0.0229s
-     - 0.0240s
+     - 0.0200s [1.67 MB]
+     - 0.0200s [1.64 MB]
    * - #6
-     - PHP
-     - 0.0419s
-     - 0.0427s
-   * - #7
-     - Perl
-     - 0.0462s
-     - 0.0571s
-   * - #8
      - Crystal
-     - 0.0508s
-     - 0.0388s
+     - 0.0400s [2.49 MB]
+     - 0.0400s [2.74 MB]
+   * - #7
+     - PHP
+     - 0.0400s [9.58 MB]
+     - 0.0400s [9.91 MB]
+   * - #8
+     - Perl
+     - 0.0400s [5.66 MB]
+     - 0.0500s [5.60 MB]
    * - #9
      - Node.js
-     - 0.0671s
-     - 0.0627s
+     - 0.0600s [64.14 MB]
+     - 0.0600s [62.47 MB]
    * - #10
      - Haskell
-     - 0.0720s
-     - 0.0717s
+     - 0.0700s [42.66 MB]
+     - 0.0700s [42.79 MB]
    * - #11
      - Java
-     - 0.0944s
-     - 0.1081s
+     - 0.0900s [53.55 MB]
+     - 0.1000s [59.74 MB]
    * - #12
-     - Python 3
-     - 0.1182s
-     - 0.1570s
-   * - #13
      - Ruby
-     - 0.1179s
-     - 0.1322s
+     - 0.1000s [18.97 MB]
+     - 0.1200s [15.15 MB]
+   * - #13
+     - Python 3
+     - 0.1100s [9.29 MB]
+     - 0.1600s [9.90 MB]
+   * - #14
+     - Raku
+     - 0.3000s [160.97 MB]
+     - 0.6500s [159.43 MB]
+   * - #15
+     - R
+     - 0.3100s [84.72 MB]
+     - 0.3200s [89.98 MB]
+
+Suite 4: Async Latency & Percentile Checker (10,000 Tasks)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 25 30 30
+
+   * - Rank
+     - Language
+     - Race Mode (Optimized)
+     - Out-of-the-Box (Naive)
+   * - 🥇 #1
+     - Nim
+     - 0.0020s [1.68 MB]
+     - 0.0025s [1.62 MB]
+   * - 🥈 #2
+     - Crystal
+     - 0.0028s [1.68 MB]
+     - 0.0030s [1.71 MB]
+   * - 🥉 #3
+     - Go
+     - 0.0032s [2.27 MB]
+     - 0.0037s [2.41 MB]
+   * - #4
+     - PHP
+     - 0.0081s [8.84 MB]
+     - 0.0103s [9.46 MB]
+   * - #5
+     - Perl
+     - 0.0089s [4.09 MB]
+     - 0.0100s [4.53 MB]
+   * - #6
+     - Haskell
+     - 0.0090s [7.34 MB]
+     - 0.0093s [7.45 MB]
+   * - #7
+     - Rust
+     - 0.0100s [1.63 MB]
+     - 0.0100s [1.59 MB]
+   * - #8
+     - C
+     - 0.0200s [1.64 MB]
+     - 0.0200s [1.60 MB]
+   * - #9
+     - C++
+     - 0.0200s [2.62 MB]
+     - 0.0200s [2.64 MB]
+   * - #10
+     - Python 3
+     - 0.0200s [6.64 MB]
+     - 0.0300s [7.73 MB]
+   * - #11
+     - Node.js
+     - 0.0300s [59.14 MB]
+     - 0.0400s [66.12 MB]
+   * - #12
+     - Ruby
+     - 0.0400s [11.56 MB]
+     - 0.0500s [12.22 MB]
+   * - #13
+     - Java
+     - 0.0600s [43.68 MB]
+     - 0.0700s [46.55 MB]
    * - #14
      - R
-     - 0.3126s
-     - 0.3354s
+     - 0.1600s [57.21 MB]
+     - 0.1700s [57.04 MB]
    * - #15
      - Raku
-     - 0.3222s
-     - 0.7091s
+     - 0.2900s [160.54 MB]
+     - 0.2800s [152.78 MB]
 
 Local Development with Podman
 -----------------------------
@@ -295,11 +368,9 @@ Clean artifacts and binaries::
 
    make clean
 
-Adding a New Benchmark Suite
-----------------------------
-1. Create a new directory (e.g. ``async_checker/``) with a ``benchmark.json`` descriptor.
-2. Provide ``naive/`` and ``optimized/`` implementations following the naming convention.
-3. Run ``make all`` to automatically execute and publish results to the dashboard.
+Adding a New Contender or Benchmark
+-----------------------------------
+Please review `CONTRIBUTING.rst <CONTRIBUTING.rst>`_ to enter the arena and submit optimized implementations.
 
 Support & Donations
 -------------------

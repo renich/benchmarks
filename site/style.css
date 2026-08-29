@@ -10,6 +10,11 @@
   --cat-interpreted: #f97316;
 }
 
+html {
+  scroll-behavior: smooth;
+  overflow-y: scroll; /* Always show scrollbar to prevent horizontal layout jump */
+}
+
 body {
   min-height: 100vh;
   display: flex;
@@ -36,6 +41,32 @@ header {
   margin-bottom: 0.75rem;
 }
 
+/* Stable Suite Navigation */
+#suite-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  min-height: 2.75rem;
+}
+
+#suite-nav button {
+  padding: 0.5rem 1.25rem;
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+#suite-nav button.active {
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+  border-color: var(--pico-primary-background);
+}
+
+/* Stat Grid Layout Stability */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -49,6 +80,10 @@ header {
   background: var(--pico-card-background-color);
   border: 1px solid var(--pico-muted-border-color);
   text-align: center;
+  min-height: 8rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .stat-card .label {
@@ -63,12 +98,16 @@ header {
   font-size: 1.85rem;
   font-weight: 800;
   color: var(--pico-color);
+  line-height: 1.2;
 }
 
 .stat-card .subtext {
   font-size: 0.75rem;
   color: var(--pico-muted-color);
   margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Mode Switcher Buttons */
@@ -78,7 +117,6 @@ header {
   margin-bottom: 2rem;
 }
 
-.mode-toggle role[group],
 .segmented-control {
   display: inline-flex;
   background: var(--pico-card-background-color);
@@ -98,6 +136,7 @@ header {
   color: var(--pico-color);
   cursor: pointer;
   transition: all 0.2s ease;
+  min-width: 13rem;
 }
 
 .segmented-control button.active {
@@ -148,13 +187,13 @@ header {
 
 .rank-1 {
   background: var(--rank-gold);
-  color: #fff;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  color: #000;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
 }
 
 .rank-2 {
   background: var(--rank-silver);
-  color: #fff;
+  color: #000;
 }
 
 .rank-3 {
@@ -168,92 +207,105 @@ header {
   border: 1px solid var(--pico-muted-border-color);
 }
 
-/* Visual Progress & Bar Charts */
-.bar-container {
+/* Visual Bars */
+#chart-bars {
+  min-height: 32rem;
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.chart-bar-row {
+  margin-bottom: 0.65rem;
 }
 
 .bar-track {
-  flex: 1;
+  width: 100%;
   height: 1.25rem;
-  background: var(--pico-muted-border-color);
-  border-radius: 4px;
+  background: var(--pico-card-background-color);
+  border-radius: 9999px;
   overflow: hidden;
-  position: relative;
+  border: 1px solid var(--pico-muted-border-color);
+  display: flex;
 }
 
 .bar-fill {
   height: 100%;
-  border-radius: 4px;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 9999px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 4px;
 }
 
-.bar-compiled { background: #10b981; }
-.bar-jit { background: #6366f1; }
-.bar-interpreted { background: #f97316; }
-
-.speedup-pill {
-  font-size: 0.8rem;
-  font-weight: 700;
-  white-space: nowrap;
-  min-width: 4.5rem;
+.bar-compiled {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
 }
 
-/* Interactive Table */
+.bar-jit {
+  background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
+}
+
+.bar-interpreted {
+  background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
+}
+
+/* Fixed Table Stability */
 .benchmark-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  margin-top: 1rem;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
 
-.benchmark-table th {
-  background: var(--pico-card-background-color);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.85rem;
-  border-bottom: 2px solid var(--pico-muted-border-color);
-}
-
+.benchmark-table th,
 .benchmark-table td {
-  padding: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
   vertical-align: middle;
-  border-bottom: 1px solid var(--pico-muted-border-color);
+  padding: 0.75rem 0.5rem;
 }
 
-.benchmark-table tr:hover td {
-  background: rgba(255, 255, 255, 0.03);
+.benchmark-table th:nth-child(1), .benchmark-table td:nth-child(1) { width: 4.5rem; text-align: center; }
+.benchmark-table th:nth-child(2), .benchmark-table td:nth-child(2) { width: 15rem; }
+.benchmark-table th:nth-child(3), .benchmark-table td:nth-child(3) { width: 9rem; }
+.benchmark-table th:nth-child(4), .benchmark-table td:nth-child(4) { width: 14rem; }
+.benchmark-table th:nth-child(5), .benchmark-table td:nth-child(5) { width: 11rem; }
+.benchmark-table th:nth-child(6), .benchmark-table td:nth-child(6) { width: 9rem; }
+.benchmark-table th:nth-child(7), .benchmark-table td:nth-child(7) { width: 7rem; text-align: right; }
+
+.speedup-pill {
+  font-weight: 700;
+  font-family: monospace;
+  font-size: 0.95rem;
 }
 
 .btn-inspect {
   padding: 0.3rem 0.75rem;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   margin: 0;
   border-radius: 4px;
 }
 
-/* Source Code Modal */
+/* Modal Styling */
 dialog article {
   max-width: 850px;
-  width: 90%;
+  width: 90vw;
 }
 
-pre {
-  max-height: 450px;
+dialog pre {
+  max-height: 55vh;
   overflow-y: auto;
-  border-radius: var(--pico-border-radius);
+  background: #090d16;
+  border: 1px solid var(--pico-muted-border-color);
   padding: 1rem;
+  border-radius: var(--pico-border-radius);
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 
+/* Footer Styling */
 footer {
   margin-top: auto;
-  padding: 2rem 0;
+  padding: 2.5rem 0;
+  background: var(--pico-card-background-color);
   border-top: 1px solid var(--pico-muted-border-color);
-  text-align: center;
   font-size: 0.85rem;
-  color: var(--pico-muted-color);
 }

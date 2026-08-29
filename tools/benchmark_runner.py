@@ -209,32 +209,42 @@ def run_benchmark_command(cmd, work_dir, runs=3):
     sys_times = []
     max_rss_list = []
 
-    devnull = open(os.devnull, "wb")
+    time_bin = shutil.which("time") or "/usr/bin/time"
 
     for i in range(runs):
         start = time.perf_counter()
+        wrapped_cmd = f"{time_bin} -f \"__BENCH_META__:%M:%e:%U:%S\" bash -c '{cmd}'"
         proc = subprocess.Popen(
-            cmd,
+            wrapped_cmd,
             shell=True,
             cwd=str(work_dir),
-            stdout=devnull,
+            stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
         )
         _, stderr_data = proc.communicate()
         elapsed = time.perf_counter() - start
 
         if proc.returncode != 0:
-            devnull.close()
             error_msg = stderr_data.decode("utf-8", errors="replace").strip()
             raise RuntimeError(f"Command '{cmd}' failed (exit {proc.returncode}): {error_msg}")
 
-        ru = resource.getrusage(resource.RUSAGE_CHILDREN)
-        times.append(elapsed)
-        user_times.append(ru.ru_utime)
-        sys_times.append(ru.ru_stime)
-        max_rss_list.append(ru.ru_maxrss / 1024.0)
-
-    devnull.close()
+        stderr_text = stderr_data.decode("utf-8", errors="replace")
+        import re
+        match = re.search(r"__BENCH_META__:(\d+):([0-9.]+):([0-9.]+):([0-9.]+)", stderr_text)
+        if match:
+            rss_kb = int(match.group(1))
+            wall_s = float(match.group(2))
+            u_time = float(match.group(3))
+            s_time = float(match.group(4))
+            times.append(wall_s if wall_s > 0 else elapsed)
+            user_times.append(u_time)
+            sys_times.append(s_time)
+            max_rss_list.append(rss_kb / 1024.0)
+        else:
+            times.append(elapsed)
+            user_times.append(0.0)
+            sys_times.append(0.0)
+            max_rss_list.append(0.0)
 
     mean_time = statistics.mean(times)
     median_time = statistics.median(times)
