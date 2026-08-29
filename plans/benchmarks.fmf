@@ -1,0 +1,21 @@
+summary: Run polyglot benchmarks on high-core hardware
+discover:
+  how: fmf
+execute:
+  how: tmt
+prepare:
+  - how: install
+    package:
+      - podman
+      - make
+      - python3
+      - time
+      - git
+environment:
+  RUNS: "3"
+adjust:
+  - when: arch == x86_64
+    hardware:
+      cpu:
+        cores: ">= 32"
+      memory: ">= 64 GB"

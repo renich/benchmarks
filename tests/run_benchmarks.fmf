@@ -1,0 +1,4 @@
+summary: Run benchmarks and verify dataset
+test: ./tests/test.bash
+framework: shell
+duration: 30m

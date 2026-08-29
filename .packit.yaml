@@ -1,0 +1,43 @@
+# See the documentation for more information:
+# https://packit.dev/docs/configuration/
+
+specfile_path: benchmarks.spec
+upstream_project_url: https://gitlab.com/renich/benchmarks
+issue_repository: https://gitlab.com/renich/benchmarks
+
+actions:
+  post-upstream-clone:
+    - "python3 -m compileall tools/"
+
+jobs:
+  - job: copr_build
+    trigger: pull_request
+    targets:
+      - fedora-rawhide-x86_64
+      - fedora-41-x86_64
+    settings:
+      builder: "powerful"
+
+  - job: copr_build
+    trigger: commit
+    branch: master
+    targets:
+      - fedora-rawhide-x86_64
+      - fedora-41-x86_64
+    settings:
+      builder: "powerful"
+
+  - job: tests
+    trigger: pull_request
+    targets:
+      - fedora-rawhide-x86_64
+      - fedora-41-x86_64
+    tmt_plan: "/plans/benchmarks"
+
+  - job: tests
+    trigger: commit
+    branch: master
+    targets:
+      - fedora-rawhide-x86_64
+      - fedora-41-x86_64
+    tmt_plan: "/plans/benchmarks"
