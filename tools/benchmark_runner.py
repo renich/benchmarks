@@ -154,6 +154,15 @@ LANGUAGE_TEMPLATES = {
         "run": "{bin}",
         "version_cmd": "rustc --version",
     },
+    "zig": {
+        "name": "Zig",
+        "category": "Compiled",
+        "ext": "zig",
+        "compile": "zig build-exe -O ReleaseSafe -femit-bin={bin} {src}",
+        "compile_opt": "zig build-exe -O ReleaseFast -mcpu=native -femit-bin={bin} {src}",
+        "run": "{bin}",
+        "version_cmd": "zig version",
+    },
 }
 
 

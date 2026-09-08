@@ -1,7 +1,7 @@
 Name:           benchmarks
 Version:        0.4.0
 Release:        %autorelease
-Summary:        Polyglot benchmark suite across 15 programming languages
+Summary:        Polyglot benchmark suite across 16 programming languages
 
 License:        GPL-3.0-or-later
 URL:            https://gitlab.com/renich/benchmarks
@@ -13,7 +13,7 @@ BuildRequires:  make
 
 %description
 A reproducible, multi-language benchmark suite comparing execution times,
-isolated peak memory usage (RSS), and I/O throughput across 15 programming
+isolated peak memory usage (RSS), and I/O throughput across 16 programming
 languages running inside isolated containerized environments.
 
 %prep

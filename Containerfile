@@ -23,7 +23,8 @@ RUN apk update && apk add --no-cache \
     rakudo \
     ruby \
     rust \
-    time
+    time \
+    zig
 
 RUN ln -sf /usr/lib/jvm/default-jvm/bin/javac /usr/local/bin/javac
 

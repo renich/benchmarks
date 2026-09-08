@@ -3,13 +3,13 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := all
 
 .PHONY: all naive optimized clean \
-        c.naive cpp.naive crystal.naive go.naive haskell.naive java.naive js.naive nim.naive perl.naive php.naive python3.naive r.naive raku.naive ruby.naive rust.naive \
-        c.opt cpp.opt crystal.opt go.opt haskell.opt java.opt js.opt nim.opt perl.opt php.opt python3.opt r.opt raku.opt ruby.opt rust.opt
+        c.naive cpp.naive crystal.naive go.naive haskell.naive java.naive js.naive nim.naive perl.naive php.naive python3.naive r.naive raku.naive ruby.naive rust.naive zig.naive \
+        c.opt cpp.opt crystal.opt go.opt haskell.opt java.opt js.opt nim.opt perl.opt php.opt python3.opt r.opt raku.opt ruby.opt rust.opt zig.opt
 
 all: optimized naive
 
 # --- OPTIMIZED (RACE MODE) ---
-optimized: c.opt cpp.opt crystal.opt go.opt haskell.opt java.opt js.opt nim.opt perl.opt php.opt python3.opt r.opt raku.opt ruby.opt rust.opt
+optimized: c.opt cpp.opt crystal.opt go.opt haskell.opt java.opt js.opt nim.opt perl.opt php.opt python3.opt r.opt raku.opt ruby.opt rust.opt zig.opt
 
 c.opt:
 	@mkdir -p optimized/_build
@@ -72,8 +72,13 @@ rust.opt:
 	rustc -O -C target-cpu=native -o optimized/_build/bin_rust optimized/async_checker.rs
 	time ./optimized/_build/bin_rust > /dev/null
 
+zig.opt:
+	@mkdir -p optimized/_build
+	zig build-exe -O ReleaseFast -mcpu=native -femit-bin=optimized/_build/bin_zig optimized/async_checker.zig
+	time ./optimized/_build/bin_zig > /dev/null
+
 # --- NAIVE (OUT-OF-THE-BOX MODE) ---
-naive: c.naive cpp.naive crystal.naive go.naive haskell.naive java.naive js.naive nim.naive perl.naive php.naive python3.naive r.naive raku.naive ruby.naive rust.naive
+naive: c.naive cpp.naive crystal.naive go.naive haskell.naive java.naive js.naive nim.naive perl.naive php.naive python3.naive r.naive raku.naive ruby.naive rust.naive zig.naive
 
 c.naive:
 	@mkdir -p naive/_build
@@ -135,6 +140,11 @@ rust.naive:
 	@mkdir -p naive/_build
 	rustc -O -o naive/_build/bin_rust naive/async_checker.rs
 	time ./naive/_build/bin_rust > /dev/null
+
+zig.naive:
+	@mkdir -p naive/_build
+	zig build-exe -O ReleaseSafe -femit-bin=naive/_build/bin_zig naive/async_checker.zig
+	time ./naive/_build/bin_zig > /dev/null
 
 clean:
 	rm -rf naive/_build optimized/_build
